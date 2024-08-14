@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">  
+
+    <select id="selectPageCount">
+        SELECT COUNT(*) as count
+        FROM board
+    </select>
+
+    <select id="selectBoardList">
+        SELECT id
+             , user_id as userId
+             , title
+             , content
+             , rgst_time as rgstTm
+             , update_rgst_time as rgstTmUp
+        FROM board
+        <if test="user_id != null">
+        WHERE user_id LIKE CONCAT('%',#{user_id},'%')
+        </if>
+        <if test="title != null">
+        WHERE title LIKE CONCAT('%',#{title},'%')
+        </if>
+        <if test="content != null">
+        WHERE content LIKE CONCAT('%',#{content},'%')
+        </if>
+        ORDER BY rgst_time DESC
+        LIMIT ${pageNo}, 10
+    </select>
+
+    <insert id="insertBoardList">
+        INSERT INTO image_list
+        (
+            user_phone_number
+          <if test="file != null">
+          , img_url
+          </if> 
+          , img_type
+          , img_color
+          , img_title
+          , img_sub_title
+          , img_content
+        )
+        VALUES
+        (
+            #{user_phone_number}
+          <if test="file != null">
+          , #{file}
+          </if> 
+          , #{img_type}
+          , #{img_color}
+          , #{img_title}
+          , #{img_sub_title}
+          , #{img_content}
+        )
+    </insert>
+
+    <select id="selectProductList">
+        SELECT
+            prd_id
+          , CONCAT('http://192.168.0.14/', SUBSTR(prd_img,23)) as prd_img
+          , prd_type
+          , prd_name
+          , prd_title
+          , prd_sub_title
+          , prd_content
+          , prd_price
+          , rgst_dtm
+        FROM prd_list
+        WHERE prd_type = #{prd_type}
+        ORDER BY rgst_dtm DESC
+    </select>
+
+    <insert id="insertProductList">
+        INSERT INTO prd_list
+        (
+            prd_img
+          , prd_type
+          , prd_name
+          , prd_title
+          , prd_sub_title
+          , prd_content
+          , prd_price
+        )
+        VALUES
+        (
+            #{file}
+          , #{prd_type}
+          , #{prd_name}
+          , #{prd_title}
+          , #{prd_sub_title}
+          , #{prd_content}
+          , #{prd_price}
+        )
+    </insert>
+
+    <insert id="insertLikeProductList">
+        INSERT INTO prd_like_list
+        (
+            ph_num
+          , prd_id
+          , prd_img
+          , prd_type
+          , prd_name
+          , prd_title
+          , prd_sub_title
+          , prd_content
+          , prd_price
+        )
+        VALUES
+        (
+            #{ph_num}
+          , #{prd_id}
+          , #{prd_img}
+          , #{prd_type}
+          , #{prd_name}
+          , #{prd_title}
+          , #{prd_sub_title}
+          , #{prd_content}
+          , #{prd_price}
+        )
+    </insert>
+
+    <update id="updateLikeProductList">
+        UPDATE prd_like_list
+        SET ph_num = #{ph_num}
+          , prd_id = #{prd_id}
+          , prd_img = #{prd_img}
+          , prd_type = #{prd_type}
+          , prd_name = #{prd_name}
+          , prd_title = #{prd_title}
+          , prd_sub_title = #{prd_sub_title}
+          , prd_content = #{prd_content}
+          , prd_price = #{prd_price}
+          , rgst_dtm = NOW()
+        WHERE ph_num = #{ph_num}
+        AND   prd_id = #{prd_id}
+    </update>
+
+    <insert id="insertHateProductList">
+        INSERT INTO hate_product_list
+        (
+            user_phone_num
+          , product_id
+          , product_url
+          , product_name
+          , product_type
+          , product_title
+          , product_sub_title
+          , product_content
+        )
+        VALUES
+        (
+            #{user_phone_num}
+          , #{product_id}
+          , #{product_url}
+          , #{product_name}
+          , #{product_type}
+          , #{product_title}
+          , #{product_sub_title}
+          , #{product_content}
+        )
+    </insert>
+
+    <insert id="insertBuyProductList">
+        INSERT INTO prd_buy_list
+        (
+            ph_num
+          , prd_id
+          , prd_img
+          , prd_type
+          , prd_name
+          , prd_title
+          , prd_sub_title
+          , prd_content
+          , prd_price
+        )
+        VALUES
+        (
+            #{ph_num}
+          , #{prd_id}
+          , #{prd_img}
+          , #{prd_type}
+          , #{prd_name}
+          , #{prd_title}
+          , #{prd_sub_title}
+          , #{prd_content}
+          , #{prd_price}
+        )
+    </insert>
+
+    <update id="updateBuyProductList">
+      UPDATE prd_buy_list
+      SET ph_num = #{ph_num}
+        , prd_id = #{prd_id}
+        , prd_img = #{prd_img}
+        , prd_type = #{prd_type}
+        , prd_name = #{prd_name}
+        , prd_title = #{prd_title}
+        , prd_sub_title = #{prd_sub_title}
+        , prd_content = #{prd_content}
+        , prd_price = #{prd_price}
+        , rgst_dtm = NOW()
+      WHERE ph_num = #{ph_num}
+      AND   prd_id = #{prd_id}
+    </update>
+
+    <select id="selctprdLikeCt">
+        SELECT COUNT(prd_id) as prdIdCt
+        FROM prd_like_list
+        WHERE prd_id = #{prd_id}
+        AND ph_num = #{ph_num}
+    </select>
+
+    <select id="selctprdHateCt">
+        SELECT COUNT(product_id) as prdIdCt
+        FROM hate_product_list
+        WHERE product_id = #{product_id}
+    </select>
+
+    <select id="selctprdBuyCt">
+        SELECT COUNT(prd_id) as prdIdCt
+        FROM prd_buy_list
+        WHERE prd_id = #{prd_id}
+        AND ph_num = #{ph_num}
+    </select>
+
+
+    <select id="selectLikePrdList">
+        SELECT 
+            ph_num
+          , prd_id
+          , prd_img
+          , prd_type
+          , prd_name
+          , prd_title
+          , prd_sub_title
+          , prd_content
+          , prd_price
+        FROM prd_like_list
+        WHERE ph_num = #{ph_num}
+    </select>
+
+    <select id="selectPrdBuyList">
+      SELECT 
+          ph_num
+        , prd_id
+        , prd_img
+        , prd_type
+        , prd_name
+        , prd_title
+        , prd_sub_title
+        , prd_content
+        , prd_price
+      FROM prd_buy_list
+      WHERE ph_num = #{ph_num}
+  </select>
+
+    
+</mapper>

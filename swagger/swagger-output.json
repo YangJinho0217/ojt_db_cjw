@@ -1,0 +1,180 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "varsion": "0.0.1",
+      "title": "OJT API server",
+      "description": "OJT api 서버 swagger 문서",
+      "version": "1.0.0"
+    },
+    "host": "localhost:3200",
+    "basePath": "/",
+    "tags": [
+      {
+        "name": "user",
+        "description": "회원가입/로그인/로그아웃"
+      }
+    ],
+    "paths": {
+      "/user/signIn": {
+        "post": {
+          "tags": [
+            "user"
+          ],
+          "summary": "사용자 로그인",
+          "description": "사용자가 로그인한다.",
+          "parameters" : [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "login_id": { "type": "string", "example" : "altm56@gmail.com" },
+                  "login_pw": { "type": "string", "example" : "123" }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resultCode": {
+                    "type": "number",
+                    "example": 200
+                  },
+                  "resultMsg": {
+                    "type": "string",
+                    "example": "로그인 성공"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "userId" : {
+                        "type" : "number",
+                        "example" : 1
+                      },
+                      "loginId" : {
+                        "type" : "string",
+                        "example" : "altm56@gmail.com"
+                      },
+                      "isFirst" : {
+                        "type" : "number",
+                        "example" : 1
+                      },
+                      "userName" : {
+                        "type" : "string",
+                        "example" : "홍길동"
+                      },
+                      "userLevel" : {
+                        "type" : "number",
+                        "example" : 3
+                      },
+                      "userStatus" : {
+                        "type" : "string",
+                        "example" : "W"
+                      }
+                    }
+                  }
+                },
+                "xml": {
+                  "name": "main"
+                }
+              }
+            }
+          }
+        }
+      },
+      "/user/signUp": {
+        "post": {
+          "tags": [
+            "user"
+          ],
+          "summary": "사용자 회원가입",
+          "description": "사용자가 회원가입한다.",
+          "content": "application/json",
+          "parameters" : [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "login_id": { "type": "string", "example" : "altm56@gmail.com" },
+                  "user_name": { "type": "string", "example" : "홍길동" },
+                  "user_level" : { "type" : "number", "example" : 3}
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resultCode": {
+                    "type": "number",
+                    "example": 200
+                  },
+                  "resultMsg": {
+                    "type": "string",
+                    "example": "회원가입 성공"
+                  }
+                },
+                "xml": {
+                  "name": "main"
+                }
+              }
+            }
+          }
+        }
+      },
+      "/user/modify": {
+        "put": {
+          "tags": [
+            "user"
+          ],
+          "summary": "사용자 비밀번호 변경",
+          "description": "사용자가 비밀번호를 변경한다.",
+          "parameters" : [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "login_id": { "type": "string", "example" : "altm56@gmail.com" },
+                  "current_password" : {"type" : "string", "example" : "NbghWIoeJ(yu#408orcQ2lcQu1o#AwXcIZQOuT@G$)h!hq6GX)ujcJGzjqMuE!%5ITTnSBt5"},
+                  "new_password" : { "type" : "string", "example" : "qwer123"}
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resultCode": {
+                    "type": "number",
+                    "example": 200
+                  },
+                  "resultMsg": {
+                    "type": "string",
+                    "example": "비밀번호 변경 성공"
+                  }
+                },
+                "xml": {
+                  "name": "main"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userss">  
+
+    <select id="selectUserInfo">
+        SELECT
+              ph_num
+            , user_email
+            , user_notice
+            , user_name
+            , user_birthday
+            , user_gender
+            , user_terms
+            , rgst_dtm
+        FROM
+            user_info 
+        WHERE
+            ph_num = #{phNum}
+    </select>
+
+    <delete id="deleteUserInfo">
+        DELETE FROM user_info
+        WHERE user_id = #{user_id}
+    </delete>
+
+    <insert id="insertAuthInfo">
+        INSERT INTO auth_info
+        (
+            ph_num
+          , auth_code
+        )
+        VALUES
+        (
+            #{phNum}
+          , #{authCode}
+        )
+    </insert>
+
+    <update id="updateAuthInfo">
+        UPDATE auth_info
+        SET auth_code = #{authCode}
+        WHERE ph_num = #{phNum}
+    </update>
+
+    <update id="updateLoginDtm">
+        UPDATE user_info
+        SET login_dtm = now()
+        WHERE ph_num = #{phNum}
+    </update>
+
+    <select id="selectAuthInfo">
+        SELECT ph_num
+             , auth_code
+        FROM auth_info
+        WHERE ph_num = #{phNum}
+    </select>
+
+    <insert id="insertShwipeUser">
+        INSERT INTO user_info
+        (
+            ph_num
+          , user_email
+          , user_notice
+          , user_name
+          , user_birthday
+          , user_gender
+          , user_terms
+        )
+        VALUES
+        (
+            #{phNum}
+          , #{userEmail} 
+          , #{userNotice}
+          , #{userName}
+          , #{userBirthDay}
+          , #{userGender}
+          , #{userTerms}
+        )
+    </insert>
+
+    <select id="selectSessionCheck">
+        SELECT *
+        FROM user_info
+        WHERE ph_num = #{phNum}
+        AND DATE_ADD(NOW(), INTERVAL - 1 DAY) >= DATE(login_dtm)
+    </select>
+    
+</mapper>
