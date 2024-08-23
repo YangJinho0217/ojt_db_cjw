@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="prj">  
+
+    <select id="nextvalId">
+        SELECT nextval(#{id}) FROM DUAL;
+    </select>
+
+
+    <select id="selectPrj">
+        SELECT prj_id
+        FROM project
+        WHERE prj_id = #{prj_id}
+    </select>
+
+    <select id="selectPrjVersion">
+        SELECT *
+        FROM project_version
+        WHERE prj_id = #{prj_id}
+        AND version_number = #{version_number}
+    </select>
+
+    <insert id="insertPrj">
+        INSERT INTO project
+        (
+            prj_id
+          , prj_name
+          , prj_description
+          , prj_start_version
+          , prj_sec_user
+          , prj_dev_user
+        )
+        VALUES
+        (
+            #{prj_id}
+          , #{prj_name}
+          , #{prj_description}
+          , #{prj_start_version}
+          , #{prj_sec_user}
+          , #{prj_dev_user}
+        )
+    </insert>
+
+    <insert id="insertPrjVersion">
+        INSERT INTO project_version
+        (
+            version_id
+          , prj_id
+          , version_number
+        )
+        VALUES
+        (
+            #{version_id}
+          , #{prj_id}
+          , #{version_number}
+        )
+    </insert>
+    
+    <insert id="insertPrjStepCreate">
+        INSERT INTO project_step
+        (
+            step_id
+          , prj_id
+          , version_number
+          , step_number
+          , step_status
+          , step_url
+          , step_file
+          , step_comment
+        ) 
+        VALUES
+        (
+            #{step_id}
+          , #{prj_id}
+          , #{version_number}
+          , #{step_number}
+          , #{step_status}
+          , #{step_url}
+          , #{step_file}
+          , #{step_comment}
+        )
+    </insert>
+
+    <insert id="insertPrjHistoryCreate">
+        INSERT INTO project_history
+        (
+            history_id
+          , prj_id
+          , version_number
+          , step_number
+          , step_status
+          , step_url
+          , step_file
+          , step_comment
+        ) 
+        VALUES
+        (
+            #{history_id}
+          , #{prj_id}
+          , #{version_number}
+          , #{step_number}
+          , #{step_status}
+          , #{step_url}
+          , #{step_file}
+          , #{step_comment}
+        )
+    </insert>
+
+    <select id="selectPrjList">
+        SELECT a.prj_id                                     AS prjId
+             , a.prj_name                                   AS prjName
+             , a.prj_description                            AS prjDescription
+             , b.user_name                                  AS prjSecUserName
+             , a.prj_sec_user                               AS prjSecUserId
+             , c.user_name                                  AS prjDevUserName
+             , a.prj_dev_user                               AS prjDevUserId
+             , a.prj_start_version                          AS prjStartVersion
+             , DATE_FORMAT(a.rgst_dtm, '%Y/%m/%d %H:%i:%s') AS rgstDtm
+        FROM project a
+        LEFT JOIN user_info b ON FIND_IN_SET(b.user_id, a.prj_sec_user) > 0
+        LEFT JOIN user_info c ON FIND_IN_SET(c.user_id, a.prj_dev_user) > 0
+        WHERE 1=1
+        <if test="prj_sec_user != undefined">
+            AND FIND_IN_SET(#{prj_sec_user}, a.prj_sec_user) > 0
+        </if>
+        <if test="prj_dev_user != undefined">
+            AND FIND_IN_SET(#{prj_dev_user}, a.prj_dev_user) > 0
+        </if>
+        ORDER BY rgstDtm DESC
+    </select>
+
+    <select id="selectPrjStep">
+        SELECT step_id             AS stepId
+             , prj_id              AS prjId
+             , version_number      AS versionNumber
+             , step_number         AS stepNumber
+             , step_status         AS stepStatus
+             , step_url            AS stepUrl
+             , step_file           AS stepFile
+             , step_comment        AS stepComment
+             , step_result_comment AS stepResultComment
+             , step_result_file    AS stepResultFile
+             , step_result_url     AS stepResultUrl
+        FROM  project_step
+        WHERE prj_id = #{prj_id}
+        AND   version_number = #{version_number}
+    </select>
+
+    <insert id="insertPrjStep">
+        INSERT INTO project_step
+        (
+            step_id
+          , prj_id
+          , version_number
+          , step_number
+          , step_status
+          , step_result_comment
+          , step_result_file
+          , step_result_url
+        )
+        VALUES
+        (
+            #{step_id}
+          , #{prj_id}
+          , #{version_number}
+          , #{step_number}
+          , #{step_status}
+          , #{step_result_comment}
+          , #{step_result_file}
+          , #{step_result_url}
+        )
+        ON DUPLICATE KEY UPDATE
+            step_number         = #{step_number}
+          , step_status         = #{step_status}
+          , step_result_comment = #{step_result_comment}
+          , step_result_file    = #{step_result_file}
+          , step_result_url     = #{step_result_url}
+        
+    </insert>
+
+    <insert id="insertPrjHistory">
+        INSERT INTO project_history
+        (
+            history_id
+          , prj_id
+          , version_number
+          , step_number
+          , step_status
+          , step_url
+          , step_file
+          , step_comment
+          , step_result_comment
+          , step_result_file
+          , step_result_url
+        ) 
+        VALUES
+        (
+            #{history_id}
+          , #{prj_id}
+          , #{version_number}
+          , #{step_number}
+          , #{step_status}
+          , #{step_url}
+          , #{step_file}
+          , #{step_comment}
+          , #{step_result_comment}
+          , #{step_result_file}
+          , #{step_result_url}
+        )
+    </insert>
+
+</mapper>
