@@ -1,4 +1,4 @@
-const mapper = require("../loaders/mapper");
+const mapper = require("./mapper");
 const dbconfig = require("../config/db");
 const mysql = require("mysql2/promise");
 const pool = mysql.createPool(dbconfig);

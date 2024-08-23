@@ -2,14 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 /* router path */
-const web = require("../api/web");
-const userss = require("../api/userss");
-const board = require("../api/board");
 const user = require("../api/user");
+const prj = require("../api/prj");
 
-router.use("/web", web);
-router.use("/user", user);
-router.use("/userss", userss);
-router.use("/board", board);
+router.use("/das/user", user);
+router.use("/das/prj", prj);
 
 module.exports = router;

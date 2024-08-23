@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const port = 3200;
 
 const router = require("./src/loaders/routes");
@@ -13,18 +14,20 @@ app.use(cors({
   methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
 }))
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(router);
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 1000000}));
 
+// app.use(express.json({limit : '50mb'}));
+// app.use(express.urlencoded({ extended: true }));
+app.use(router);
 // 개발서버 포트
 app.set('port', process.env.PORT || port);
 
 //swagger 모듈 호출하기
-app.use("/ojt-cjw-swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile, {explorer : true}));
+app.use("/das-sdl-swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile, {explorer : true}));
 
 app.get("/", (req, res) => {
-  res.send("BackEnd Server Page");
+  res.send("BackEnd Server index Page");
 });
 
 app.listen(port, () => {

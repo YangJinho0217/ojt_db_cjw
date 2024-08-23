@@ -3,7 +3,7 @@
 <mapper namespace="user">  
 
   <select id="nextvalAppUserId">
-    SELECT nextval(#{id}) FROM DUAL;
+    SELECT nextval(#{id}) as user_id FROM DUAL;
   </select>
 
   <select id="selctCountUserInfoList">
@@ -13,24 +13,71 @@
   <select id="selectUserInfoList">
     SELECT user_id AS userId
          , login_id AS loginId
+         , isfirst AS isFirst
+         , user_name AS userName
+         , user_level AS userLevel
+         , user_status AS userStatus
          , rgst_dtm AS rgstDtm
     FROM user_info
-    ORDER BY user_id DESC
+    ORDER BY rgstDtm DESC
     LIMIT ${currentPage}, ${itemPerPage};
   </select>
 
+  <update id="updateUserInfoIsFirst">
+    UPDATE user_info 
+    SET isfirst = 0
+    WHERE login_id = #{login_id}
+  </update>
+
+  <select id="selectUserPassword">
+    SELECT login_id AS loginId
+         , login_pw AS loginPw
+    FROM user_info
+    WHERE login_id = #{login_id}
+  </select>
+
   <select id="selectUserInfo">
-      SELECT
-        login_id AS loginId,
-        login_pw AS loginPw,
-        isfirst AS isFirst,
-        user_name AS userName,
-        user_level AS userLevel,
-        user_status AS userStatus
-      FROM
-        user_info 
-      WHERE
-        login_id = #{login_id}
+    SELECT login_id                                     AS loginId
+          , isfirst                                      AS isFirst
+          , user_name                                    AS userName
+          , user_level                                   AS userLevel
+          , user_status                                  AS userStatus
+          , CASE WHEN user_level = 3 THEN '개발담당자'
+              WHEN user_level = 2 THEN '보안담당자'
+              WHEN user_level = 1 THEN '시스템관리자'
+            ELSE ''
+            END                                          AS userRole
+          , DATE_FORMAT(rgst_dtm, '%Y/%m/%d %H:%i:%s')   AS rgstDtm
+    FROM user_info 
+    WHERE login_id = #{login_id}
+  </select>
+
+  <select id="selectAdminUser">
+    SELECT login_id
+    FROM user_info
+    WHERE user_level = 1
+  </select>
+
+  <insert id="insertUserAuth">
+    INSERT INTO user_auth
+    (
+      login_id,
+      auth_code
+    )
+    VALUES
+    (
+      #{login_id},
+      #{auth_code}
+    )
+    ON DUPLICATE KEY UPDATE
+      auth_code = #{auth_code}
+  </insert>
+
+  <select id="selectUserAuth">
+    SELECT login_id AS loginId
+         , auth_code AS authCode
+    FROM user_auth
+    WHERE login_id = #{login_id}
   </select>
 
   <insert id="insertUserInfo">
@@ -56,10 +103,50 @@
     )
   </insert>
 
+  <update id="updateUserPassword">
+    UPDATE user_info
+    SET login_pw = #{login_pw}
+    WHERE login_id = #{login_id}
+  </update>
+
+  <update id="updateUserStatus">
+    UPDATE user_info
+    SET user_status = #{user_status}
+    WHERE login_id = #{login_id}
+  </update>
+
   <update id="updateModify">
     UPDATE user_info
     SET login_pw = #{new_password}
       , isfirst = #{isfirst}
     WHERE login_id = #{login_id}
   </update>
+
+  <select id="selectDvList">
+    SELECT user_id                                      AS userId
+         , login_id                                     AS loginId
+         , isfirst                                      AS isFirst
+         , user_name                                    AS userName
+         , user_level                                   AS userLevel
+         , user_status                                  AS userStatus
+         , CASE WHEN user_level = 3 THEN '보안담당자'
+                WHEN user_level = 2 THEN '개발담당자'
+                WHEN user_level = 1 THEN '시스템관리자'
+           ELSE ''
+           END                                          AS userRole
+         , DATE_FORMAT(rgst_dtm, '%Y/%m/%d %H:%i:%s')   AS rgstDtm
+    FROM user_info
+    WHERE isfirst = 0
+    <if test=" user_level != undefined">
+      AND user_level = #{user_level} 
+    </if>
+    <if test=" user_name != undefined">
+      AND user_name LIKE CONCAT('%', #{user_name}, '%')
+    </if>
+    <if test=" login_id != undefined">
+      AND login_id LIKE CONCAT('%', #{login_id}, '%')
+    </if>
+    ORDER BY rgst_dtm DESC;
+  </select>
+
 </mapper>
