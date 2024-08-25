@@ -1,5 +1,5 @@
 const multer = require("multer");
-const fs = require('fs');
+
 
 // 파일 업로드 위치 지정
 var storage = multer.diskStorage({
@@ -28,7 +28,7 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     // 일단 임시로 중복저장 허용하기 위해 Date.now 사용
-    cb(null, Date.now() + '.' + file.originalname);
+    cb(null, getDate() + '.' + file.originalname);
   },
 });
 
@@ -54,31 +54,6 @@ function getDate() {
   var fullString = dateString +  '.' + timeString
 
   return  fullString
-}
-
-function fileUpload(file, prj_id, ) {
-  const uploadPath = path.join('public', 'user');
-
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-
-  // 파일을 저장할 경로에 연도, 월, 일을 추가
-  const datePath = path.join(uploadPath, year.toString(), month, day, user_id);
-
-  // 디렉터리가 존재하지 않으면 생성
-  if (!fs.existsSync(datePath)) {
-    fs.mkdirSync(datePath, { recursive: true });
-  }
-
-  // 파일 경로 설정
-  const filePath = path.join(datePath, file.originalname);
-
-  // 파일 저장
-  fs.writeFileSync(filePath, file.buffer);
-
-  return filePath
 }
 
 const upload = multer({ storage: storage });

@@ -15,7 +15,6 @@
       }
     ],
     "paths": {
-      
       "/user/sendEmailAuth": {
         "post": {
           "tags": [
@@ -456,10 +455,13 @@
               "example": "코멘트 내용"
             },
             {
-              "name": "file",
+              "name": "files",
               "in": "formData",
-              "type": "file",
-              "required": false
+              "type": "array",
+              "items": {
+                "type": "file"
+              },
+              "required": true
             }
           ],
           "responses": {

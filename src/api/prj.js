@@ -6,7 +6,7 @@ const upload = require("../loaders/multer");
 /* ========== ============= ========== */
 /* ========== 프로젝트 생성 POST ========== */
 /* ========== ============= ========== */
-router.post('/ctPrj', upload.single('file'), async (req, res) => {
+router.post('/ctPrj', upload.array('files'), async (req, res) => {
 
     var param = {
         prj_name : req.body.prj_name,
@@ -16,33 +16,35 @@ router.post('/ctPrj', upload.single('file'), async (req, res) => {
         prj_dev_user : req.body.prj_dev_user,
         step_url : typeof req.body.step_url == "undefined" ? null : req.body.step_url,
         step_comment : typeof req.body.step_comment == "undefined" ? null : req.body.step_comment,
-        step_file : typeof req.file == "undefined" ? null : req.file.path
+        step_file : typeof req.files == "undefined" ? null : req.files.path
     }
+    console.log(param)
 
-    param.prj_id = await mysql.value('prj', 'nextvalId', {id : 'prj_id'});
-    param.version_id = await mysql.value('prj', 'nextvalId', {id : 'version_id'});
-    param.step_id = await mysql.value('prj', 'nextvalId', {id : 'step_id'});
-    param.history_id = await mysql.value('prj', 'nextvalId', {id : 'history_id'}); 
-    param.version_number = param.prj_start_version;
-    param.step_number = 1
-    param.step_status = 'W'
+    // param.prj_id = await mysql.value('prj', 'nextvalId', {id : 'prj_id'});
+    // param.version_id = await mysql.value('prj', 'nextvalId', {id : 'version_id'});
+    // param.step_id = await mysql.value('prj', 'nextvalId', {id : 'step_id'});
+    // param.history_id = await mysql.value('prj', 'nextvalId', {id : 'history_id'}); 
+    // param.version_number = param.prj_start_version;
+    // param.step_number = 1
+    // param.step_status = 'W'
 
-    // project 테이블에 insert
-    await mysql.proc('prj', 'insertPrj', param);
+    // // project 테이블에 insert
+    // await mysql.proc('prj', 'insertPrj', param);
 
-    // project_version 테이블에 insert
-    await mysql.proc('prj', 'insertPrjVersion', param);
+    // // project_version 테이블에 insert
+    // await mysql.proc('prj', 'insertPrjVersion', param);
 
-    // project_step 테이블에 insert
-    await mysql.proc('prj', 'insertPrjStepCreate', param);
+    // // project_step 테이블에 insert
+    // await mysql.proc('prj', 'insertPrjStepCreate', param);
 
-    // project_history 테이블에 insert
-    await mysql.proc('prj', 'insertPrjHistoryCreate', param);
+    // // project_history 테이블에 insert
+    // await mysql.proc('prj', 'insertPrjHistoryCreate', param);
 
 
     return res.json({
         resultCode : 200,
-        resultMsg : "프로젝트 생성 완료"
+        resultMsg : "프로젝트 생성 완료",
+        data : param
     });
     
 })
