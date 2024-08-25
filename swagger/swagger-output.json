@@ -503,17 +503,71 @@
           ],
           "summary": "프로젝트 버전 생성",
           "description": "사용자가 프로젝트 내 버전을 생성한다.",
-          "parameters" : [
+          "consumes": ["multipart/form-data"],
+          "parameters": [
             {
-              "name": "body",
-              "in": "body",
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "prj_id": { "type": "number", "example" : 1, "required" : true},
-                  "version_number": { "type": "string", "example" : "v0.0.1", "required" : true}
-                }
-              }
+              "name": "prj_id",
+              "in": "formData",
+              "type": "number",
+              "required": true,
+              "example": "1"
+            },
+            {
+              "name": "prj_name",
+              "in": "formData",
+              "type": "string",
+              "required": true,
+              "example": "프로젝트1"
+            },
+            {
+              "name": "prj_description",
+              "in": "formData",
+              "type": "string",
+              "required": true,
+              "example": "이 프로젝트는 러시아에서 시작되어 전세계적으로 펼쳐져.."
+            },
+            {
+              "name": "version_number",
+              "in": "formData",
+              "type": "string",
+              "required": true,
+              "example": "v0.0.1"
+            },
+            {
+              "name": "prj_sec_user",
+              "in": "formData",
+              "type": "array",
+              "items" : {
+                "type" : "number"
+              },
+              "required": true,
+              "example": 2
+            },
+            {
+              "name": "prj_dev_user",
+              "in": "formData",
+              "type": "array",
+              "items" : {
+                "type" : "number"
+              },
+              "required": true,
+              "example": 1
+            },
+            {
+              "name": "step_url",
+              "in": "formData",
+              "type": "string", 
+              "example": "http://example.com",
+              "required" : true
+            },
+            {
+              "name": "files",
+              "in": "formData",
+              "type": "array",
+              "items" : {
+                "type" : "file"
+              },
+              "required": true
             }
           ],
           "responses": {
@@ -528,7 +582,7 @@
                   },
                   "resultMsg": {
                     "type": "string",
-                    "example": "프로젝트 생성 완료"
+                    "example": "프로젝트 버전 생성 완료"
                   },
                   "data": {
                     "type": "object",
@@ -555,14 +609,8 @@
           "description": "사용자가 프로젝트를 조회한다.",
           "parameters" : [
             {
-              "name" : "prj_sec_user",
-              "description" : "보안담당자 아이디",
-              "in" : "query",
-              "type" : "number"
-            },
-            {
-              "name" : "prj_dev_user",
-              "description" : "개발담당자 아이디",
+              "name" : "user_id",
+              "description" : "유저 아이디 값",
               "in" : "query",
               "type" : "number"
             }
@@ -580,48 +628,6 @@
                   "resultMsg": {
                     "type": "string",
                     "example": "프로젝트 조회 완료"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "prjId" : {
-                        "type" : "number",
-                        "example" : "1"
-                      },
-                      "prjName" : {
-                        "type" : "string",
-                        "example" : "프로젝트1"
-                      },
-                      "prjContent" : {
-                        "type" : "string",
-                        "example" : "어쩌구 저쩌구 ..."
-                      },
-                      "sctUser" : {
-                        "type" : "string",
-                        "example" : "홍길동"
-                      },
-                      "sctId" : {
-                        "type" : "number",
-                        "example" : 2
-                      },
-                      "devUser" : {
-                        "type" : "string",
-                        "example" : "동길이형"
-                      },
-                      "devId" : {
-                        "type" : "number",
-                        "example" : 1
-                      },
-                      "currentVersion" : {
-                        "type" : "string",
-                        "example" : "v0.0.1"
-                      },
-                      "rgstDtm" : {
-                        "type" : "string",
-                        "example" : "2024/08/16 10:21:54"
-                      }
-
-                    }
                   }
                 },
                 "xml": {
