@@ -15,38 +15,77 @@ router.post('/ctPrj', upload.array('files'), async (req, res) => {
         prj_sec_user : req.body.prj_sec_user,
         prj_dev_user : req.body.prj_dev_user,
         step_url : typeof req.body.step_url == "undefined" ? null : req.body.step_url,
-        step_comment : typeof req.body.step_comment == "undefined" ? null : req.body.step_comment,
-        step_file : typeof req.files == "undefined" ? null : req.files.path
+        step_file : typeof req.files == "undefined" ? null : req.files
+    };
+
+    const secUser = param.prj_sec_user.split(',');
+    const devUser = param.prj_dev_user.split(',');
+
+    param.prj_id = await mysql.value('prj', 'nextvalId', {id : 'prj_id'});
+    param.version_id = await mysql.value('prj', 'nextvalId', {id : 'version_id'});
+    param.step_id = await mysql.value('prj', 'nextvalId', {id : 'step_id'});
+    param.version_number = param.prj_start_version;
+    param.step_number = 1;
+    param.step_status = 'W';
+
+    try {
+        // project_security_manager 테이블 insert
+        for (var i = 0; i < secUser.length; i ++) {
+
+            const data = {
+                prj_sec_id : param.prj_id + 'S' + secUser[i],
+                prj_id : param.prj_id,
+                version_number : param.version_number,
+                sec_id : secUser[i]
+            };
+            await mysql.proc('prj', 'insertPrjSecManager', data);
+        }
+
+        // project_develop_manager 테이블 insert
+        for (var i = 0; i < devUser.length; i++) {
+
+            const data = {
+                prj_dev_id : param.prj_id + 'D' + devUser[i],
+                prj_id : param.prj_id,
+                version_number : param.version_number,
+                dev_id : devUser[i]
+            };
+
+            await mysql.proc('prj', 'insertPrjDevManager', data);
+        }
+
+        for (var i = 0; i < param.step_file.length; i++) {
+
+            const file_id = await mysql.value('prj', 'nextvalId', {id : 'file_id'});
+            const data = {
+                file_id : file_id,
+                prj_id : param.prj_id,
+                version_number : param.version_number,
+                file_path : param.step_file[i].path
+            };
+
+            await mysql.proc('prj', 'insertPrjFile', data);
+        }
+
+        // project 테이블에 insert
+        await mysql.proc('prj', 'insertPrj', param);
+
+        // project_version 테이블에 insert
+        await mysql.proc('prj', 'insertPrjVersion', param);
+
+        // project_step 테이블에 insert
+        await mysql.proc('prj', 'insertPrjStepCreate', param);
+    } catch(error) {
+        return res.json({
+            resultCode : 500,
+            resultMsg : 'SERVER ERROR'
+        })
+    } finally {
+        return res.json({
+            resultCode : 200,
+            resultMsg : "프로젝트 생성 완료"
+        });
     }
-    console.log(param)
-
-    // param.prj_id = await mysql.value('prj', 'nextvalId', {id : 'prj_id'});
-    // param.version_id = await mysql.value('prj', 'nextvalId', {id : 'version_id'});
-    // param.step_id = await mysql.value('prj', 'nextvalId', {id : 'step_id'});
-    // param.history_id = await mysql.value('prj', 'nextvalId', {id : 'history_id'}); 
-    // param.version_number = param.prj_start_version;
-    // param.step_number = 1
-    // param.step_status = 'W'
-
-    // // project 테이블에 insert
-    // await mysql.proc('prj', 'insertPrj', param);
-
-    // // project_version 테이블에 insert
-    // await mysql.proc('prj', 'insertPrjVersion', param);
-
-    // // project_step 테이블에 insert
-    // await mysql.proc('prj', 'insertPrjStepCreate', param);
-
-    // // project_history 테이블에 insert
-    // await mysql.proc('prj', 'insertPrjHistoryCreate', param);
-
-
-    return res.json({
-        resultCode : 200,
-        resultMsg : "프로젝트 생성 완료",
-        data : param
-    });
-    
 })
 
 /* ========== ============= ========== */
@@ -75,9 +114,6 @@ router.post('/addPrjVer', async(req, res) => {
             resultMsg : '해당 버전이 존재합니다'
         })
     }
-
-    
-
 })
 
 /* ========== ============= ========== */
@@ -92,36 +128,55 @@ router.get('/prjList', async(req, res) => {
 
     const prjList = await mysql.query('prj', 'selectPrjList', param);
 
-    // 결과를 가공하여 원하는 형식으로 반환
-    const formattedProjects = prjList.reduce((acc, project) => {
-        const existingProject = acc.find(p => p.prjId === project.prjId);
-        
-        console.log(existingProject);
-        if (existingProject) {
-            // 이미 존재하는 프로젝트에 보안 담당자와 개발 담당자 추가
-            if (!existingProject.prjSecUserName.includes(project.prjSecUserName)) {
-                existingProject.prjSecUserName += `, ${project.prjSecUserName}`;
-            }
-            if (!existingProject.prjDevUserName.includes(project.prjDevUserName)) {
-                existingProject.prjDevUserName += `, ${project.prjDevUserName}`;
-            }
-        } else {
-            // 새로운 프로젝트 추가
-            acc.push({
-                prjId: project.prjId,
-                prjName: project.prjName,
-                prjDescription: project.prjDescription,
-                prjSecUserName: project.prjSecUserName,
-                prjSecUser: project.prjSecUserId,
-                prjDevUserName: project.prjDevUserName,
-                prjDevUser: project.prjDevUserId,
-                prjStartVersion: project.prjStartVersion,
-                rgstDtm: project.rgstDtm
-            });
-        }
+    const devUser = await mysql.query('prj', 'selectUserList', param);
+    const secUser = await mysql.query('prj', 'selectUserList', param);
 
-        return acc;
-    }, []);
+    const projectSteps = results1.map(step => ({
+        ...step,
+        user_names: []
+    }));
+
+    // 개발자 정보를 프로젝트 단계에 추가
+    results2.forEach(dev => {
+        const projectStep = projectSteps.find(step => step.prj_id === dev.prj_id);
+        if (projectStep) {
+            projectStep.user_names.push(dev.user_name);
+        }
+    });
+
+    // 결과 출력
+    console.log(projectSteps);
+
+    // 결과를 가공하여 원하는 형식으로 반환
+    // const formattedProjects = prjList.reduce((acc, project) => {
+    //     const existingProject = acc.find(p => p.prjId === project.prjId);
+        
+    //     console.log(existingProject);
+    //     if (existingProject) {
+    //         // 이미 존재하는 프로젝트에 보안 담당자와 개발 담당자 추가
+    //         if (!existingProject.prjSecUserName.includes(project.prjSecUserName)) {
+    //             existingProject.prjSecUserName += `, ${project.prjSecUserName}`;
+    //         }
+    //         if (!existingProject.prjDevUserName.includes(project.prjDevUserName)) {
+    //             existingProject.prjDevUserName += `, ${project.prjDevUserName}`;
+    //         }
+    //     } else {
+    //         // 새로운 프로젝트 추가
+    //         acc.push({
+    //             prjId: project.prjId,
+    //             prjName: project.prjName,
+    //             prjDescription: project.prjDescription,
+    //             prjSecUserName: project.prjSecUserName,
+    //             prjSecUser: project.prjSecUserId,
+    //             prjDevUserName: project.prjDevUserName,
+    //             prjDevUser: project.prjDevUserId,
+    //             prjStartVersion: project.prjStartVersion,
+    //             rgstDtm: project.rgstDtm
+    //         });
+    //     }
+
+    //     return acc;
+    // }, []);
 
     return res.json({
         resultCode : 200,
@@ -134,12 +189,18 @@ router.get('/prjList', async(req, res) => {
 /* ========== ============= ========== */
 /* ========== 프로젝트 상세 조회 ========== */
 /* ========== ============= ========== */
-router.get('/prjDetail', async(req, res) => {
+router.post('/detail', async(req, res) => {
     
     var param = {
-        prj_id : req.query.prj_id,
-        version_number : req.query.version_number
+        prj_id : req.body.prj_id,
+        version_number : req.body.version_number
     }
+
+    const value = await mysql.query('prj', 'selectPrjDetail', param);
+
+    console.log(value);
+
+
 })
 
 /* ========== ============= ========== */

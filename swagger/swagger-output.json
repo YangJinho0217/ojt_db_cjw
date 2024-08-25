@@ -406,6 +406,7 @@
           ],
           "summary": "프로젝트 생성",
           "description": "사용자가 프로젝트를 생성한다.",
+          "consumes": ["multipart/form-data"],
           "parameters": [
             {
               "name": "prj_name",
@@ -431,35 +432,36 @@
             {
               "name": "prj_sec_user",
               "in": "formData",
-              "type": "string",
+              "type": "array",
+              "items" : {
+                "type" : "number"
+              },
               "required": true,
-              "example": "[1,2]"
+              "example": 2
             },
             {
               "name": "prj_dev_user",
               "in": "formData",
-              "type": "string",
+              "type": "array",
+              "items" : {
+                "type" : "number"
+              },
               "required": true,
-              "example": "[1,2]"
+              "example": 1
             },
             {
               "name": "step_url",
               "in": "formData",
               "type": "string", 
-              "example": "http://example.com"
-            },
-            {
-              "name": "step_comment",
-              "in": "formData",
-              "type": "string",
-              "example": "코멘트 내용"
+              "example": "http://example.com",
+              "required" : true
             },
             {
               "name": "files",
               "in": "formData",
               "type": "array",
-              "items": {
-                "type": "file"
+              "items" : {
+                "type" : "file"
               },
               "required": true
             }
@@ -619,6 +621,56 @@
                         "example" : "2024/08/16 10:21:54"
                       }
 
+                    }
+                  }
+                },
+                "xml": {
+                  "name": "main"
+                }
+              }
+            }
+          }
+        }
+      },
+      "/prj/detail": {
+        "post": {
+          "tags": [
+            "prj"
+          ],
+          "summary": "프로젝트 특정 버전 조회",
+          "description": "사용자가 특정 버전 정보를 조회한다.",
+          "parameters" : [
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prj_id": { "type": "number", "example" : 1, "required" : true},
+                  "version_number": { "type": "string", "example" : "v0.0.1", "required" : true}
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resultCode": {
+                    "type": "number",
+                    "example": 200
+                  },
+                  "resultMsg": {
+                    "type": "string",
+                    "example": "프로젝트 생성 완료"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "resultCode" : { "type" : "number", "example" : 200 },
+                      "resultMsg" : { "type" : "string", "example" : "프로젝트 생성 완료"}
                     }
                   }
                 },

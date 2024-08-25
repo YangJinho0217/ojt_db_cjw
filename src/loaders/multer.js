@@ -1,37 +1,16 @@
 const multer = require("multer");
 
-
 // 파일 업로드 위치 지정
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const prj_id = req.body.prj_id; // prj_id를 요청 바디에서 가져오기
-    const version_id = req.body.version_id; // version_id를 요청 바디에서 가져오기
-
     // // 최종 저장 경로 지정
     cb(null, process.env.PWD + '/src/file/');
-
-    // 기본 업로드 경로
-    // const uploadPath = path.join('file', prj_id, version_id);
-
-    // // prj_id 경로가 없으면 생성
-    // if (!fs.existsSync(path.join('file', prj_id))) {
-    //   fs.mkdirSync(path.join('file', prj_id), { recursive: true });
-    // }
-
-    // // version_id 경로가 없으면 생성
-    // if (!fs.existsSync(uploadPath)) {
-    //   fs.mkdirSync(uploadPath, { recursive: true });
-    // }
-
-    // // 최종 저장 경로 지정
-    // cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     // 일단 임시로 중복저장 허용하기 위해 Date.now 사용
-    cb(null, getDate() + '.' + file.originalname);
+    cb(null, file.originalname);
   },
 });
-
 
 /* 이미지 링크 DB 저장 시 DATE 값을 앞에 추가 후 저장 하고 있음 */
 /* DATE값 추출 function */
