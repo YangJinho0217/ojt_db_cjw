@@ -176,13 +176,13 @@
 
   <select id="selectPrjAll">
     SELECT a.prj_id
-        , a.prj_name
-        , a.prj_description
-        , a.version_number
-        , b.step_number
-        , b.step_status
-        , b.rgst_dtm
-        , b.updt_dtm
+         , a.prj_name
+         , a.prj_description
+         , a.version_number
+         , b.step_number
+         , b.step_status
+         , b.rgst_dtm
+         , b.updt_dtm
     FROM project_version a, project_step b
     WHERE a.prj_id = b.prj_id
     AND a.version_number = b.version_number
@@ -226,7 +226,7 @@
     AND p.prj_id = psm.prj_id
     AND psm.sec_id = sm.user_id
     AND p.prj_id = ps.prj_id
-    <if test=" user_id != 1 and user_id != undefined">
+    <if test="user_id != undefined">
     AND p.prj_id IN (
       SELECT pdm2.prj_id
       FROM project_develop_manager pdm2
@@ -241,6 +241,21 @@
     </if>
     GROUP BY p.prj_id
     ORDER BY p.prj_id DESC
+  </select>
+
+  <select id="selectPrjListCount">
+    SELECT a.prj_id
+         , a.prj_name
+         , a.prj_description
+         , a.version_number
+         , b.step_number
+         , b.step_status
+         , b.rgst_dtm
+         , b.updt_dtm
+    FROM project_version a, project_step b
+    WHERE a.prj_id = b.prj_id
+    AND a.version_number = b.version_number
+    ORDER BY b.rgst_dtm DESC
   </select>
 
   <select id="selectPrjHistory">

@@ -256,8 +256,17 @@ router.get('/prjList', async(req, res) => {
     
     }).filter(item => item !== null);
 
-    const myProjectListTotalCount = await mysql.query('prj', 'selectPrjCount', param);
-    const totalPage = Math.ceil(myProjectListTotalCount.length / itmesPerPage);
+    let pageCount;
+    
+    if (param.user_id == undefined) {
+        const myProjectListAllCount = await mysql.query('prj', 'selectPrjListCount', param);
+        pageCount = myProjectListAllCount;
+    } else {
+        const myProjectListTotalCount = await mysql.query('prj', 'selectPrjCount', param);
+        pageCount = myProjectListTotalCount;
+    }
+    
+    const totalPage = Math.ceil(pageCount.length / itmesPerPage);
 
     return res.json({
         resultCode : 200,
@@ -283,6 +292,20 @@ router.get('/detail', async(req, res) => {
     const myProjectListSecUser = await mysql.query('prj', 'selectPrjSecUser', param);
     const myProjectListFile = await mysql.query('prj', 'selectPrjFile', param);
 
+    const newFileList = [];
+    
+    // 특정 문자열
+    const specificString = process.env.SERVER_URL;
+
+    // 변환된 파일 경로 리스트
+    const modifiedPaths = myProjectListFile.map(item => {
+        // '/file' 이전의 부분을 제거
+        const newPath = item.file_path.split('/develop')[1];
+        // 특정 문자열과 합치기
+        return { file_path: specificString + newPath };
+    });
+
+    
     // 결과를 저장할 배열
     const combinedProjectList = value.map(prj => {
         // 개발자 및 보안 사용자 정보를 찾기
@@ -303,7 +326,7 @@ router.get('/detail', async(req, res) => {
             dev_user_name : devUser ? devUser.user_name : null,
             sec_ids: secUser ? secUser.sec_ids : null,  // 보안 사용자 ID
             sec_user_name : secUser ? secUser.user_name : null,
-            files : myProjectListFile
+            files : modifiedPaths
         };
     });
     return res.json({

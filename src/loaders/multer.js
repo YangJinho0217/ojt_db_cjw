@@ -1,19 +1,23 @@
 const multer = require("multer");
+const path = require('path');
 const fs = require('fs');
 
 // 파일 업로드 위치 지정
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const prjId = req.body.prj_id; // prj_id를 요청 본문에서 읽기
-    const versionNumber = req.body.version_number
+    const versionNumber = req.body.version_number;
+
+    // 기본 경로 설정
+    let uploadPath;
 
     if (!prjId) {
-      const uploadPath = `${process.env.PWD}/src/file/default/`;
-      fs.mkdirSync(uploadPath, { recursive: true });
-      return cb(null, uploadPath);
+      uploadPath = path.join(__dirname, '..', '..', 'file', 'default'); // 두 단계 위로 올라감
+    } else {
+      uploadPath = path.join(__dirname, '..', '..', 'file', prjId, versionNumber); // 두 단계 위로 올라감
     }
-    
-    const uploadPath = `${process.env.PWD}/src/file/${prjId}/${versionNumber}`;
+
+    // 디렉토리가 없으면 생성
     fs.mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
