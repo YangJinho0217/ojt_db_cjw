@@ -129,8 +129,8 @@
          , user_name                                    AS userName
          , user_level                                   AS userLevel
          , user_status                                  AS userStatus
-         , CASE WHEN user_level = 3 THEN '보안담당자'
-                WHEN user_level = 2 THEN '개발담당자'
+         , CASE WHEN user_level = 3 THEN '개발담당자'
+                WHEN user_level = 2 THEN '보안담당자'
                 WHEN user_level = 1 THEN '시스템관리자'
            ELSE ''
            END                                          AS userRole
@@ -146,7 +146,34 @@
     <if test=" login_id != undefined">
       AND login_id LIKE CONCAT('%', #{login_id}, '%')
     </if>
-    ORDER BY rgst_dtm DESC;
+    ORDER BY rgst_dtm DESC
+    LIMIT ${page_no}, 10
+  </select>
+  <select id="selectDvListCount">
+    SELECT user_id                                      AS userId
+         , login_id                                     AS loginId
+         , isfirst                                      AS isFirst
+         , user_name                                    AS userName
+         , user_level                                   AS userLevel
+         , user_status                                  AS userStatus
+         , CASE WHEN user_level = 3 THEN '개발담당자'
+                WHEN user_level = 2 THEN '보안담당자'
+                WHEN user_level = 1 THEN '시스템관리자'
+           ELSE ''
+           END                                          AS userRole
+         , DATE_FORMAT(rgst_dtm, '%Y/%m/%d %H:%i:%s')   AS rgstDtm
+    FROM user_info
+    WHERE isfirst = 0
+    <if test=" user_level != undefined">
+      AND user_level = #{user_level} 
+    </if>
+    <if test=" user_name != undefined">
+      AND user_name LIKE CONCAT('%', #{user_name}, '%')
+    </if>
+    <if test=" login_id != undefined">
+      AND login_id LIKE CONCAT('%', #{login_id}, '%')
+    </if>
+    ORDER BY rgst_dtm DESC
   </select>
 
 </mapper>

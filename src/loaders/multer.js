@@ -1,14 +1,25 @@
 const multer = require("multer");
+const fs = require('fs');
 
 // 파일 업로드 위치 지정
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // // 최종 저장 경로 지정
-    cb(null, process.env.PWD + '/src/file/');
+    const prjId = req.body.prj_id; // prj_id를 요청 본문에서 읽기
+    const versionNumber = req.body.version_number
+
+    if (!prjId) {
+      const uploadPath = `${process.env.PWD}/src/file/default/`;
+      fs.mkdirSync(uploadPath, { recursive: true });
+      return cb(null, uploadPath);
+    }
+    
+    const uploadPath = `${process.env.PWD}/src/file/${prjId}/${versionNumber}`;
+    fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     // 일단 임시로 중복저장 허용하기 위해 Date.now 사용
-    cb(null, file.originalname);
+    cb(null, getDate() + '_' + file.originalname);
   },
 });
 

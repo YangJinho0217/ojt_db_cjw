@@ -429,25 +429,25 @@ router.put('/modify', async(req,res) => {
 router.get('/dvList', async(req,res) => {
 
     var param = {
+        page_no : req.query.page_no,
         user_name : req.query.user_name,
         login_id : req.query.login_id,
         user_level : req.query.user_level
     }
 
+    const itmesPerPage = 10;
+    const currentPage = (param.page_no - 1) * itmesPerPage;
+
+    param.page_no = currentPage;
+
     const dvList = await mysql.query("user", "selectDvList", param)
+    const dvListCount = await mysql.query('user', 'selectDvListCount', param);
 
-    // const data = [
-    //     {'id' : 1, 'text' : '12345677', 'tf_flag' : true},
-    //     {'id' : 2, 'text' : 'qwdasd', 'tf_flag' : false},
-    //     {'id' : 3, 'text' : 'fnqfnqwj', 'tf_flag' : true},
-    //     {'id' : 4, 'text' : 'nfwndanda', 'tf_flag' : false},
-    // ]
-
-    // console.log(data.toString())
-
+    const totalCount = Math.ceil(dvListCount.length / itmesPerPage);
     return res.json({
         resultCode : 200,
         resultMsg : 'OK',
+        totalPage : totalCount,
         data : dvList
     })
 
