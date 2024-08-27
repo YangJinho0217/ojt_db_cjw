@@ -15,7 +15,7 @@ router.post('/ctPrj', upload.array('files'), async (req, res) => {
         prj_start_version : req.body.prj_start_version,
         prj_sec_user : req.body.prj_sec_user,
         prj_dev_user : req.body.prj_dev_user,
-        step_url : typeof req.body.step_url == "undefined" ? null : req.body.step_url,
+        prj_lnk : req.body.prj_lnk,
         step_file : typeof req.files == "undefined" ? null : req.files
     };
 
@@ -101,7 +101,7 @@ router.post('/addPrjVer', upload.array('files'), async(req, res) => {
         version_number : req.body.version_number,
         prj_sec_user : req.body.prj_sec_user,
         prj_dev_user : req.body.prj_dev_user,
-        step_url : typeof req.body.step_url == "undefined" ? null : req.body.step_url,
+        prj_lnk :  req.body.prj_lnk,
         step_file : typeof req.files == "undefined" ? null : req.files
     }
 
@@ -223,6 +223,7 @@ router.get('/prjList', async(req, res) => {
                 prj_id: prj.prj_id,
                 prj_name: prj.prj_name,
                 prj_description: prj.prj_description,
+                prj_lnk : prj.prj_lnk,
                 version_number: prj.version_number,
                 step_number: prj.step_number,
                 step_status: prj.step_status,
@@ -242,6 +243,7 @@ router.get('/prjList', async(req, res) => {
             prj_id: prj.prj_id,
             prj_name: prj.prj_name,
             prj_description: prj.prj_description,
+            prj_lnk : prj.prj_lnk,
             version_number: prj.version_number,
             step_number: prj.step_number,
             step_status: prj.step_status,
@@ -290,8 +292,6 @@ router.get('/detail', async(req, res) => {
 
     // 특정 문자열
     const specificString = process.env.SERVER_URL;
-
-    
     const modifiedPaths = myProjectListFile.map(item => {
 
         if(db.host == process.env.DEV_DB_HOST) {
@@ -319,6 +319,7 @@ router.get('/detail', async(req, res) => {
             prj_id: prj.prj_id,
             prj_name: prj.prj_name,
             prj_description: prj.prj_description,
+            prj_lnk : prj.prj_lnk,
             version_number: prj.version_number,
             step_number: prj.step_number,
             step_status: prj.step_status,
@@ -331,6 +332,7 @@ router.get('/detail', async(req, res) => {
             files : modifiedPaths
         };
     });
+    
     return res.json({
         resultCode : 200,
         resultMsg : '프로젝트 특정 버전 조회 성공',
@@ -402,12 +404,12 @@ router.put('/updtPrj', upload.array('files'), async(req, res) => {
         version_number : req.body.version_number,
         prj_name : req.body.prj_name,
         prj_description : req.body.prj_description,
+        prj_lnk : req.body.prj_lnk,
         prj_sec_user : req.body.prj_sec_user,
         prj_dev_user : req.body.prj_dev_user,
         del_sec_user : req.body.del_sec_user,
         del_dev_user : req.body.del_dev_user,
         del_file_id : req.body.del_file_id,
-        step_url : typeof req.body.step_url == "undefined" ? null : req.body.step_url,
         step_file : typeof req.files == "undefined" ? null : req.files
     }
 

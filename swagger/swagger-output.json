@@ -437,6 +437,13 @@
               "example": "v0.0.1"
             },
             {
+              "name": "prj_lnk",
+              "in": "formData",
+              "type": "string", 
+              "example": "http://example.com",
+              "required" : true
+            },
+            {
               "name": "prj_sec_user",
               "in": "formData",
               "type": "array",
@@ -455,13 +462,6 @@
               },
               "required": true,
               "example": 1
-            },
-            {
-              "name": "step_url",
-              "in": "formData",
-              "type": "string", 
-              "example": "http://example.com",
-              "required" : true
             },
             {
               "name": "files",
@@ -534,6 +534,13 @@
               "example": "v0.0.1"
             },
             {
+              "name": "prj_lnk",
+              "in": "formData",
+              "type": "string", 
+              "example": "http://example.com",
+              "required" : true
+            },
+            {
               "name": "prj_sec_user",
               "in": "formData",
               "type": "array",
@@ -552,13 +559,6 @@
               },
               "required": true,
               "example": 1
-            },
-            {
-              "name": "step_url",
-              "in": "formData",
-              "type": "string", 
-              "example": "http://example.com",
-              "required" : true
             },
             {
               "name": "files",
@@ -649,6 +649,10 @@
                         "prj_description" : {
                           "type" : "string",
                           "example" : "v0.0.1"
+                        },
+                        "prj_lnk" : {
+                          "type" : "string",
+                          "example" : "https://example.com/"
                         },
                         "version_number" : {
                           "type" : "string",
@@ -752,6 +756,10 @@
                         "prj_description" : {
                           "type" : "string",
                           "example" : "v0.0.1"
+                        },
+                        "prj_lnk" : {
+                          "type" : "string",
+                          "example" : "https://example.com/"
                         },
                         "version_number" : {
                           "type" : "string",
@@ -866,6 +874,10 @@
                         },
                         "prj_description" : {
                           "type" : "string",
+                          "example" : "첫번째 프로젝트 입니다."
+                        },
+                        "version_number" : {
+                          "type" : "string",
                           "example" : "v0.0.1"
                         },
                         "step_number" : {
@@ -941,6 +953,12 @@
             "example": "이 프로젝트는 러시아에서 시작되어 전세계적으로 펼쳐져.."
           },
           {
+            "name": "prj_lnk",
+            "in": "formData",
+            "type": "string", 
+            "example": "http://example.com"
+          },
+          {
             "name": "version_number",
             "in": "formData",
             "type": "string",
@@ -991,12 +1009,6 @@
               "type" : "number"
             },
             "example": 1
-          },
-          {
-            "name": "step_url",
-            "in": "formData",
-            "type": "string", 
-            "example": "http://example.com"
           },
           {
             "name": "files",
