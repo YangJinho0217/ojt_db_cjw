@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mysql = require("../loaders/mysql");
 const upload = require("../loaders/multer");
+const db = require('../config/db');
 
 /* ========== ============= ========== */
 /* ========== 프로젝트 생성 POST ========== */
@@ -215,7 +216,7 @@ router.get('/prjList', async(req, res) => {
         const sec_ids = secUser ? secUser.sec_ids.split(',') : [];
         
         const user_id = param.user_id; // user_id를 param에서 가져옴
-    
+
         // user_id가 정의되지 않은 경우 전체 프로젝트 정보를 반환
         if (user_id === undefined || user_id === "undefined") {
             return {
@@ -236,6 +237,7 @@ router.get('/prjList', async(req, res) => {
     
         // user_id가 정의된 경우
         const isUserIdMatch = (dev_ids.includes(user_id) || sec_ids.includes(user_id));
+
         const result = {
             prj_id: prj.prj_id,
             prj_name: prj.prj_name,
@@ -257,16 +259,10 @@ router.get('/prjList', async(req, res) => {
     }).filter(item => item !== null);
 
     let pageCount;
+    const myProjectListAllCount = await mysql.query('prj', 'selectPrjListCount', param);
+    pageCount = myProjectListAllCount.length;
     
-    if (param.user_id == undefined) {
-        const myProjectListAllCount = await mysql.query('prj', 'selectPrjListCount', param);
-        pageCount = myProjectListAllCount;
-    } else {
-        const myProjectListTotalCount = await mysql.query('prj', 'selectPrjCount', param);
-        pageCount = myProjectListTotalCount;
-    }
-    
-    const totalPage = Math.ceil(pageCount.length / itmesPerPage);
+    const totalPage = Math.ceil(pageCount / itmesPerPage);
 
     return res.json({
         resultCode : 200,
@@ -292,19 +288,25 @@ router.get('/detail', async(req, res) => {
     const myProjectListSecUser = await mysql.query('prj', 'selectPrjSecUser', param);
     const myProjectListFile = await mysql.query('prj', 'selectPrjFile', param);
 
-    const newFileList = [];
-    
     // 특정 문자열
     const specificString = process.env.SERVER_URL;
 
-    // 변환된 파일 경로 리스트
+    
     const modifiedPaths = myProjectListFile.map(item => {
-        // '/file' 이전의 부분을 제거
-        const newPath = item.file_path.split('/develop')[1];
-        // 특정 문자열과 합치기
-        return { file_path: specificString + newPath };
-    });
 
+        if(db.host == process.env.DEV_DB_HOST) {
+            // '/file' 이전의 부분을 제거
+            const newPath = item.file_path.split('/develop')[1];
+            // 특정 문자열과 합치기
+            return { file_id : item.file_id, file_path: specificString + newPath };
+        } else {
+            return {
+                file_id : item.file_id,
+                file_path : item.file_path
+            }
+        }
+        
+    });
     
     // 결과를 저장할 배열
     const combinedProjectList = value.map(prj => {
@@ -331,7 +333,7 @@ router.get('/detail', async(req, res) => {
     });
     return res.json({
         resultCode : 200,
-        resultMsg : '성공',
+        resultMsg : '프로젝트 특정 버전 조회 성공',
         data : combinedProjectList
     })
 })
@@ -383,7 +385,7 @@ router.get('/prjHst', async(req,res) => {
 
     return res.json({
         resultCode : 200,
-        resultMsg : '프로젝트 조회 완료',
+        resultMsg : '특정 프로젝트 히스토리 조회 완료',
         totalPage : totalPage,
         data : combinedProjectList
     })
@@ -391,7 +393,7 @@ router.get('/prjHst', async(req,res) => {
 })
 
 /* ========== ============= ========== */
-/* ========== 프로젝트 수정 PUT ========== */
+/* ========== 프로젝트 특정 버전 수정 PUT ========== */
 /* ========== ============= ========== */
 router.put('/updtPrj', upload.array('files'), async(req, res) => {
 
@@ -402,11 +404,150 @@ router.put('/updtPrj', upload.array('files'), async(req, res) => {
         prj_description : req.body.prj_description,
         prj_sec_user : req.body.prj_sec_user,
         prj_dev_user : req.body.prj_dev_user,
+        del_sec_user : req.body.del_sec_user,
+        del_dev_user : req.body.del_dev_user,
+        del_file_id : req.body.del_file_id,
         step_url : typeof req.body.step_url == "undefined" ? null : req.body.step_url,
         step_file : typeof req.files == "undefined" ? null : req.files
     }
 
-    // console.log(param);
+    try {
+        // 버전 변경 불가
+        const projectList = await mysql.query('prj','selectPrjVersion', param);
+        if (projectList.length < 1) {
+            return res.json({
+                resultCode : 400,
+                resultMsg : '프로젝트 또는 버전이 존재하지 않습니다'
+            })
+        }
+        
+        await mysql.proc('prj', 'updatePrjVersion', param);
+
+        if (param.prj_sec_user != undefined) {
+            const secUser = param.prj_sec_user.split(',');
+        
+            // 기존 보안 담당자 조회
+            // const secUserList = await mysql.query('prj', 'selectPrjSecManager', param);
+            // const existingSecIds = secUserList.map(user => user.sec_id);
+            // // 중복되지 않는 값만 뽑아내기
+            // const uniqueSecUsers = secUser.filter(x => !existingSecIds.includes(Number(x)));
+        
+            // for (const currentSecId of uniqueSecUsers) {
+            //     // secUser가 현재 목록에 포함되어 있지 않을 때만 insert 수행
+            //     const data = {
+            //         prj_sec_id: await mysql.value('prj', 'nextvalId', { id: 'prj_sec_id' }),
+            //         prj_id: param.prj_id,
+            //         version_number: param.version_number,
+            //         sec_id: currentSecId
+            //     };
+            //     // INSERT 쿼리 실행
+            //     await mysql.proc('prj', 'insertPrjSecManager', data);
+            // }
+
+            // project_security_manager 테이블 insert
+            for (var i = 0; i < secUser.length; i ++) {
+                const data = {
+                    prj_sec_id : await mysql.value('prj', 'nextvalId', {id : 'prj_sec_id'}),
+                    prj_id : param.prj_id,
+                    version_number : param.version_number,
+                    sec_id : secUser[i]
+                };
+                await mysql.proc('prj', 'insertPrjSecManager', data);
+            }
+            
+        }
+
+        if (param.prj_dev_user != undefined) {
+            const devUser = param.prj_dev_user.split(',');
+            // // 기존 개발 담당자 조회
+            // const devUserList = await mysql.query('prj', 'selectPrjDevManager', param);
+            // const existingSecIds = devUserList.map(user => user.dev_id);
+            // // 중복되지 않는 값만 뽑아내기
+            // const uniqueSecUsers = devUser.filter(x => !existingSecIds.includes(Number(x)));
+            // // project_develop_manager 테이블 insert
+            // for (const currentDevId of uniqueSecUsers) {
+            //     // secUser가 현재 목록에 포함되어 있지 않을 때만 insert 수행
+            //     const data = {
+            //         prj_dev_id: await mysql.value('prj', 'nextvalId', { id: 'prj_dev_id' }),
+            //         prj_id: param.prj_id,
+            //         version_number: param.version_number,
+            //         dev_id: currentDevId
+            //     };
+            //     // INSERT 쿼리 실행
+            //     await mysql.proc('prj', 'insertPrjDevManager', data);
+            // }
+
+            // project_develop_manager 테이블 insert
+            for (var i = 0; i < devUser.length; i++) {
+                const data = {
+                    prj_dev_id : await mysql.value('prj', 'nextvalId', {id : 'prj_dev_id'}),
+                    prj_id : param.prj_id,
+                    version_number : param.version_number,
+                    dev_id : devUser[i]
+                };
+                await mysql.proc('prj', 'insertPrjDevManager', data);
+            }
+        }
+
+        if (param.step_file.length > 0) {
+            for (var i = 0; i < param.step_file.length; i++) {
+                const file_id = await mysql.value('prj', 'nextvalId', {id : 'file_id'});
+                const data = {
+                    file_id : file_id,
+                    prj_id : param.prj_id,
+                    version_number : param.version_number,
+                    file_path : param.step_file[i].path
+                };
+                await mysql.proc('prj', 'insertPrjFile', data);
+            }   
+        }
+
+        if (param.del_sec_user != undefined) {
+            const delSecUser = param.del_sec_user.split(',');
+            for (var i = 0; i < delSecUser.length; i ++) {
+                const data = {
+                    prj_id : param.prj_id,
+                    version_number : param.version_number,
+                    del_sec_user : delSecUser[i]
+                };
+                await mysql.proc('prj', 'deletePrjSecManager', data);
+            }
+        }
+
+        if (param.del_dev_user != undefined) {
+            const delDecUser = param.del_dev_user.split(',');
+            for (var i = 0; i < delDecUser.length; i ++) {
+                const data = {
+                    prj_id : param.prj_id,
+                    version_number : param.version_number,
+                    del_dev_user : delDecUser[i]
+                };
+                await mysql.proc('prj', 'deletePrjDevManager', data);
+            }
+        }
+
+        if (param.del_file_id != undefined) {
+            const delFileId = param.del_file_id.split(',');
+            for (var i = 0; i < delFileId.length; i++) {
+                const data = {
+                    del_file_id : delFileId[i]
+                };
+                await mysql.proc('prj', 'deletePrjFile', data);
+            }   
+        }
+
+        return res.json({
+            resultCode : 200,
+            resultMsg : '프로젝트 수정 완료'
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.json({
+            resultCode : 500,
+            resultMsg : error
+        })
+    }
 
 })
 

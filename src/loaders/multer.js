@@ -12,9 +12,13 @@ var storage = multer.diskStorage({
     let uploadPath;
 
     if (!prjId) {
-      uploadPath = path.join(__dirname, '..', '..', 'file', 'default'); // 두 단계 위로 올라감
+      uploadPath = path.join(__dirname, '..', '..', 'file', 'default');
     } else {
-      uploadPath = path.join(__dirname, '..', '..', 'file', prjId, versionNumber); // 두 단계 위로 올라감
+      if(!versionNumber) {
+        uploadPath = path.join(__dirname, '..', '..', 'file', 'default');
+      } else {
+        uploadPath = path.join(__dirname, '..', '..', 'file', prjId, versionNumber);
+      }
     }
 
     // 디렉토리가 없으면 생성

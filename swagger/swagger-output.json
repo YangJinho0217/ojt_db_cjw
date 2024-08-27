@@ -486,13 +486,6 @@
                   "resultMsg": {
                     "type": "string",
                     "example": "프로젝트 생성 완료"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "resultCode" : { "type" : "number", "example" : 200 },
-                      "resultMsg" : { "type" : "string", "example" : "프로젝트 생성 완료"}
-                    }
                   }
                 },
                 "xml": {
@@ -590,13 +583,6 @@
                   "resultMsg": {
                     "type": "string",
                     "example": "프로젝트 버전 생성 완료"
-                  },
-                  "data": {
-                    "type": "object",
-                    "properties": {
-                      "resultCode" : { "type" : "number", "example" : 200 },
-                      "resultMsg" : { "type" : "string", "example" : "프로젝트 생성 완료"}
-                    }
                   }
                 },
                 "xml": {
@@ -642,6 +628,66 @@
                   "resultMsg": {
                     "type": "string",
                     "example": "프로젝트 조회 완료"
+                  },
+                  "totalPage" : {
+                    "type" : "number",
+                    "example" : 1
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "prj_id" : {
+                          "type" : "number",
+                          "example" : 15
+                        },
+                        "prj_name" : {
+                          "type" : "string",
+                          "example" : "프로젝트입니다"
+                        },
+                        "prj_description" : {
+                          "type" : "string",
+                          "example" : "v0.0.1"
+                        },
+                        "version_number" : {
+                          "type" : "string",
+                          "example" : "v0.0.1"
+                        },
+                        "step_number" : {
+                          "type" : "number",
+                          "example" : 1
+                        },
+                        "step_status" : {
+                          "type" : "string",
+                          "example" : "W"
+                        },
+                        "rgst_dtm" : {
+                          "type" : "string",
+                          "example" : "2024-08-26 16:01:40"
+                        },
+                        "updt_dtm" : {
+                          "type" : "string",
+                          "example" : "2024-08-26 16:01:40"
+                        }, 
+                        "dev_ids" : {
+                          "type" : "string",
+                          "example" : "13, 12"
+                        },
+                        "dev_user_name" : {
+                          "type" : "string",
+                          "example" : "테스터13, 테스터12"
+                        },
+                        "sec_ids" : {
+                          "type" : "string",
+                          "example" : "3"
+                        },
+                        "sec_user_name" : {
+                          "type" : "string",
+                          "example" : "테스터"
+                        }
+                      } 
+                    }
                   }
                 },
                 "xml": {
@@ -687,13 +733,75 @@
                   },
                   "resultMsg": {
                     "type": "string",
-                    "example": "프로젝트 생성 완료"
+                    "example": "특정 프로젝트 히스토리 조회 성공"
                   },
+                  "totalPage" : {"type" : "number", "example" : 1},
                   "data": {
-                    "type": "object",
-                    "properties": {
-                      "resultCode" : { "type" : "number", "example" : 200 },
-                      "resultMsg" : { "type" : "string", "example" : "프로젝트 생성 완료"}
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "prj_id" : {
+                          "type" : "number",
+                          "example" : 15
+                        },
+                        "prj_name" : {
+                          "type" : "string",
+                          "example" : "프로젝트입니다"
+                        },
+                        "prj_description" : {
+                          "type" : "string",
+                          "example" : "v0.0.1"
+                        },
+                        "version_number" : {
+                          "type" : "string",
+                          "example" : "v0.0.1"
+                        },
+                        "step_number" : {
+                          "type" : "number",
+                          "example" : 1
+                        },
+                        "step_status" : {
+                          "type" : "string",
+                          "example" : "W"
+                        },
+                        "rgst_dtm" : {
+                          "type" : "string",
+                          "example" : "2024-08-26 16:01:40"
+                        },
+                        "updt_dtm" : {
+                          "type" : "string",
+                          "example" : "2024-08-26 16:01:40"
+                        }, 
+                        "dev_ids" : {
+                          "type" : "string",
+                          "example" : "13, 12"
+                        },
+                        "dev_user_name" : {
+                          "type" : "string",
+                          "example" : "테스터13, 테스터12"
+                        },
+                        "sec_ids" : {
+                          "type" : "string",
+                          "example" : "3"
+                        },
+                        "sec_user_name" : {
+                          "type" : "string",
+                          "example" : "테스터"
+                        },
+                        "files" : {
+                          "type" : "array",
+                          "items" : {
+                            "type": "object",
+                            "properties": {
+                              "file_path" : {
+                                "type" : "string",
+                                "example" : "https://example.com/file/어쩌구저쩌구"
+                              }
+                            }
+                          }
+                        }
+                      } 
                     }
                   }
                 },
@@ -740,13 +848,59 @@
                   },
                   "resultMsg": {
                     "type": "string",
-                    "example": "프로젝트 생성 완료"
+                    "example": "특정 프로젝트 히스토리 조회 성공"
                   },
+                  "totalPage" : {"type" : "number", "example" : 1},
                   "data": {
-                    "type": "object",
-                    "properties": {
-                      "resultCode" : { "type" : "number", "example" : 200 },
-                      "resultMsg" : { "type" : "string", "example" : "프로젝트 생성 완료"}
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "prj_id" : {
+                          "type" : "number",
+                          "example" : 15
+                        },
+                        "prj_name" : {
+                          "type" : "string",
+                          "example" : "프로젝트입니다"
+                        },
+                        "prj_description" : {
+                          "type" : "string",
+                          "example" : "v0.0.1"
+                        },
+                        "step_number" : {
+                          "type" : "number",
+                          "example" : 1
+                        },
+                        "step_status" : {
+                          "type" : "string",
+                          "example" : "W"
+                        },
+                        "rgst_dtm" : {
+                          "type" : "string",
+                          "example" : "2024-08-26 16:01:40"
+                        },
+                        "updt_dtm" : {
+                          "type" : "string",
+                          "example" : "2024-08-26 16:01:40"
+                        }, 
+                        "dev_ids" : {
+                          "type" : "string",
+                          "example" : "13, 12"
+                        },
+                        "dev_user_name" : {
+                          "type" : "string",
+                          "example" : "테스터13, 테스터12"
+                        },
+                        "sec_ids" : {
+                          "type" : "string",
+                          "example" : "3"
+                        },
+                        "sec_user_name" : {
+                          "type" : "string",
+                          "example" : "테스터"
+                        }
+                      } 
                     }
                   }
                 },
@@ -757,6 +911,131 @@
             }
           }
         }
+      },
+      "/prj/updtPrj": {
+      "put": {
+        "tags": [
+          "prj"
+        ],
+        "summary": "프로젝트 특정 버전 수정",
+        "description": "사용자가 프로젝트 특정 버전을 수정한다.",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "prj_id",
+            "in": "formData",
+            "type": "number",
+            "required": true,
+            "example": "1"
+          },
+          {
+            "name": "prj_name",
+            "in": "formData",
+            "type": "string",
+            "example": "프로젝트1"
+          },
+          {
+            "name": "prj_description",
+            "in": "formData",
+            "type": "string",
+            "example": "이 프로젝트는 러시아에서 시작되어 전세계적으로 펼쳐져.."
+          },
+          {
+            "name": "version_number",
+            "in": "formData",
+            "type": "string",
+            "example": "v0.0.5",
+            "required": true
+          },
+          {
+            "name": "prj_sec_user",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 2
+          },
+          {
+            "name": "prj_dev_user",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 1
+          },
+          {
+            "name": "del_sec_user",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 2
+          },
+          {
+            "name": "del_dev_user",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 1
+          },
+          {
+            "name": "del_file_id",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 1
+          },
+          {
+            "name": "step_url",
+            "in": "formData",
+            "type": "string", 
+            "example": "http://example.com"
+          },
+          {
+            "name": "files",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "file"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "프로젝트 특정 버전 수정 완료"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "resultCode" : { "type" : "number", "example" : 200 },
+                    "resultMsg" : { "type" : "string", "example" : "프로젝트 생성 완료"}
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
       }
     }
   }
+}

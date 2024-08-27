@@ -23,7 +23,6 @@ const query = {
     } finally {
         con.connection.release()
     }
-    
   },
   select : async (nameSpace, selectId, param) => {
     const con = await pool.getConnection(async conn => conn)

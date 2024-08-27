@@ -181,13 +181,54 @@
          , a.version_number
          , b.step_number
          , b.step_status
+         , a.rgst_dtm
+         , a.updt_dtm
+    FROM project_version a, project_step b
+    WHERE a.prj_id = b.prj_id
+    AND a.version_number = b.version_number
+    <if test="user_id != undefined">
+    AND a.prj_id IN (
+      SELECT pdm2.prj_id
+      FROM project_develop_manager pdm2
+      JOIN project p2 ON pdm2.prj_id = p2.prj_id
+      WHERE pdm2.dev_id = #{user_id}
+      UNION
+      SELECT psm2.prj_id
+      FROM project_security_manager psm2
+      JOIN project p3 ON psm2.prj_id = p3.prj_id
+      WHERE psm2.sec_id = #{user_id}
+    )
+    </if>
+    ORDER BY b.rgst_dtm DESC
+    LIMIT ${page_no} , 10;
+  </select>
+
+  <select id="selectPrjListCount">
+    SELECT a.prj_id
+         , a.prj_name
+         , a.prj_description
+         , a.version_number
+         , b.step_number
+         , b.step_status
          , b.rgst_dtm
          , b.updt_dtm
     FROM project_version a, project_step b
     WHERE a.prj_id = b.prj_id
     AND a.version_number = b.version_number
+    <if test="user_id != undefined">
+    AND a.prj_id IN (
+      SELECT pdm2.prj_id
+      FROM project_develop_manager pdm2
+      JOIN project p2 ON pdm2.prj_id = p2.prj_id
+      WHERE pdm2.dev_id = #{user_id}
+      UNION
+      SELECT psm2.prj_id
+      FROM project_security_manager psm2
+      JOIN project p3 ON psm2.prj_id = p3.prj_id
+      WHERE psm2.sec_id = #{user_id}
+    )
+    </if>
     ORDER BY b.rgst_dtm DESC
-    LIMIT ${page_no} , 10;
   </select>
 
   <select id="selectPrjDevUser">
@@ -211,51 +252,11 @@
   </select>
 
   <select id="selectPrjFile">
-    SELECT a.file_path 
+    SELECT a.file_id
+         , a.file_path
     FROM project_file a
     WHERE prj_id = #{prj_id}
     AND version_number = #{version_number}
-  </select>
-
-  <select id="selectPrjCount">
-    SELECT p.prj_id AS prjId
-    FROM project p, project_develop_manager pdm, user_info u,
-         project_security_manager psm, user_info sm, project_step ps
-    WHERE p.prj_id = pdm.prj_id
-    AND pdm.dev_id = u.user_id
-    AND p.prj_id = psm.prj_id
-    AND psm.sec_id = sm.user_id
-    AND p.prj_id = ps.prj_id
-    <if test="user_id != undefined">
-    AND p.prj_id IN (
-      SELECT pdm2.prj_id
-      FROM project_develop_manager pdm2
-      JOIN project p2 ON pdm2.prj_id = p2.prj_id
-      WHERE pdm2.dev_id = #{user_id}
-      UNION
-      SELECT psm2.prj_id
-      FROM project_security_manager psm2
-      JOIN project p3 ON psm2.prj_id = p3.prj_id
-      WHERE psm2.sec_id = #{user_id}
-    )
-    </if>
-    GROUP BY p.prj_id
-    ORDER BY p.prj_id DESC
-  </select>
-
-  <select id="selectPrjListCount">
-    SELECT a.prj_id
-         , a.prj_name
-         , a.prj_description
-         , a.version_number
-         , b.step_number
-         , b.step_status
-         , b.rgst_dtm
-         , b.updt_dtm
-    FROM project_version a, project_step b
-    WHERE a.prj_id = b.prj_id
-    AND a.version_number = b.version_number
-    ORDER BY b.rgst_dtm DESC
   </select>
 
   <select id="selectPrjHistory">
@@ -382,5 +383,51 @@
       , step_result_file    = #{step_result_file}
       , step_result_url     = #{step_result_url}
   </insert>
+
+  <update id="updatePrjVersion">
+    UPDATE project_version
+    SET
+        <if test="prj_name != undefined">
+            prj_name = #{prj_name},
+        </if>
+        <if test="prj_description != undefined">
+            prj_description = #{prj_description}
+        </if>
+    WHERE prj_id = #{prj_id}
+    AND version_number = #{version_number}
+  </update>
+
+  <select id="selectPrjSecManager">
+    SELECT *
+    FROM project_security_manager
+    WHERE prj_id = #{prj_id}
+    AND version_number = #{version_number}
+  </select>
+
+  <select id="selectPrjDevManager">
+    SELECT *
+    FROM project_develop_manager
+    WHERE prj_id = #{prj_id}
+    AND version_number = #{version_number}
+  </select>
+
+  <delete id="deletePrjSecManager">
+    DELETE from project_security_manager
+    WHERE prj_id = #{prj_id}
+    AND version_number = #{version_number}
+    AND sec_id = #{del_sec_user};
+  </delete>
+
+  <delete id="deletePrjDevManager">
+    DELETE from project_develop_manager
+    WHERE prj_id = #{prj_id}
+    AND version_number = #{version_number}
+    AND dev_id = #{del_dev_user};
+  </delete>
+
+  <delete id="deletePrjFile">
+    DELETE from project_file
+    WHERE file_id = #{del_file_id}
+  </delete>
 
 </mapper>
