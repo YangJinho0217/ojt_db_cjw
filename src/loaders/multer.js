@@ -7,6 +7,7 @@ var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const prjId = req.body.prj_id; // prj_id를 요청 본문에서 읽기
     const versionNumber = req.body.version_number;
+    const stepNumber = req.body.step_number
 
     // 기본 경로 설정
     let uploadPath;
@@ -15,9 +16,13 @@ var storage = multer.diskStorage({
       uploadPath = path.join(__dirname, '..', '..', 'file', 'default');
     } else {
       if(!versionNumber) {
-        uploadPath = path.join(__dirname, '..', '..', 'file', 'default');
+        uploadPath = path.join(__dirname, '..', '..', 'file', prjId);
       } else {
-        uploadPath = path.join(__dirname, '..', '..', 'file', prjId, versionNumber);
+        if(!stepNumber) {
+          uploadPath = path.join(__dirname, '..', '..', 'file', prjId, versionNumber);
+        } else {
+          uploadPath = path.join(__dirname, '..', '..', 'file', prjId, versionNumber, stepNumber);
+        }
       }
     }
 

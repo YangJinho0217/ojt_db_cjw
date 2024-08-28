@@ -128,6 +128,15 @@ router.post('/sendEmailAuth', async (req, res) => {
         login_id : req.body.login_id
     }
 
+    const user = await mysql.query('user', 'selectUserAuth', param);
+
+    if(user.length > 0) {
+        return res.json({
+            resultCode : 400,
+            resultMsg : '아이디가 존재합니다.'
+        })
+    }
+
     const emailAuthCode = await calc.createEmailAuthCode();
     // /* 이메일 전송  */
     await calc.emailAuthSend(param.login_id, emailAuthCode).then(async (response) => {
