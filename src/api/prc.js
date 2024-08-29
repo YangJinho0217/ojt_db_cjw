@@ -105,7 +105,7 @@ router.get('/prcInfo', async(req,res) => {
 
 
     }
-
+    console.log("!!")
     return res.json({
         resultCode : 200,
         resultMsg : "프로세스 조회 성공",
