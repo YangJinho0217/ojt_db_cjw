@@ -278,17 +278,6 @@
     </if>
   </select>
 
-  <select id="selectPrjStep">
-    SELECT step_id             AS stepId
-          , prj_id              AS prjId
-          , version_number      AS versionNumber
-          , step_number         AS stepNumber
-          , step_status         AS stepStatus
-    FROM  project_step
-    WHERE prj_id = #{prj_id}
-    AND   version_number = #{version_number}
-  </select>
-
   <insert id="insertPrjSecManager">
     INSERT INTO project_security_manager
     (
@@ -356,17 +345,16 @@
 
   <update id="updatePrjVersion">
     UPDATE project_version
-    SET
-        <if test="prj_name != undefined">
-            prj_name = #{prj_name},
-        </if>
-        <if test="prj_description != undefined">
-            prj_description = #{prj_description},
-        </if>
-        <if test="prj_lnk != undefined">
-            prj_lnk = #{prj_lnk},
-        </if>
-        updt_user_id = #{updt_user_id}
+    SET updt_user_id = #{updt_user_id}
+    <if test="prj_name != undefined">
+        ,prj_name = #{prj_name}
+    </if>
+    <if test="prj_description != undefined">
+        ,prj_description = #{prj_description}
+    </if>
+    <if test="prj_lnk != undefined">
+        ,prj_lnk = #{prj_lnk}
+    </if>    
     WHERE prj_id = #{prj_id}
     AND version_number = #{version_number}
   </update>
@@ -404,7 +392,6 @@
     WHERE file_id = #{del_file_id}
   </delete>
 
-
   <insert id="insertPrcStepInfoFile">
     INSERT INTO process_step_info_file
     (
@@ -433,7 +420,6 @@
       , step_number
       , step_lnk
       , step_description
-      , rgst_user_id
     ) 
     VALUES
     (
@@ -443,7 +429,49 @@
       , #{step_number}
       , #{step_lnk}
       , #{step_description}
-      , #{rgst_user_id}
+    )
+  </insert>
+
+  <select id="selectPrjStep">
+    SELECT  step_id             
+          , prj_id             
+          , version_number     
+          , step_number
+    FROM  project_step
+    WHERE step_id = #{step_id}
+  </select>
+
+  <select id="selectPrjStepInfo">
+    SELECT  step_id             
+          , prj_id             
+          , version_number     
+          , step_number
+    FROM  project_step
+    WHERE prj_id = #{prj_id}
+    AND version_number = #{version_number}
+    AND step_number = #{step_number}
+  </select>
+
+  <update id="updatePrjStep">
+    UPDATE project_step
+    SET step_number = #{updt_step_number}
+    WHERE step_id = #{step_id}
+  </update>
+
+  <insert id="insertPrcStepInfoDefault">
+    INSERT INTO process_step_info
+    (
+        prc_id
+      , prj_id
+      , version_number
+      , step_number
+    )
+    VALUES
+    (
+        #{prc_id}
+      , #{prj_id}
+      , #{version_number}
+      , #{updt_step_number}
     )
   </insert>
 

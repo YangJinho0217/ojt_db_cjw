@@ -228,13 +228,13 @@
         }
       }
     },
-    "/user/signOn" : {
-      "put": {
+    "/user/frgtEml": {
+      "post": {
         "tags": [
           "user"
         ],
-        "summary": "사용자 상태변경 ",
-        "description": "관리자가 사용자의 상태를 변경한다.",
+        "summary": "사용자 패스워드 찾기",
+        "description": "사용자가 패스워드를 찾기위해 이메일을 전송한다.",
         "parameters" : [
           {
             "name": "body",
@@ -242,9 +242,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "login_id": { "type": "string", "example" : "altm56@gmail.com", "required" : true},
-                "user_status" : {"type" : "string", "example" : "A", "required" : true},
-                "admin_id" : {"type" : "number", "example" : 1, "required" : true}
+                "login_id": { "type": "string", "example" : "altm56@gmail.com", "required" : true}
               }
             }
           }
@@ -261,7 +259,7 @@
                 },
                 "resultMsg": {
                   "type": "string",
-                  "example": "가입승인 성공"
+                  "example": "비밀번호 찾기 이메일 전송 성공"
                 }
               },
               "xml": {
@@ -272,7 +270,6 @@
         }
       }
     },
-    
     "/user/modify": {
       "put": {
         "tags": [
@@ -1211,6 +1208,52 @@
         }
       }
     },
+    "/prj/agrStp": {
+      "post": {
+        "tags": [
+          "prj"
+        ],
+        "summary": "프로젝트 특정 버전 단계별 승인",
+        "description": "사용자가 프로젝트 특정 버전의 특정 단계를 승인한다.",
+        "parameters" : [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "step_id": { 
+                  "type": "number",
+                  "example" : 1, 
+                  "required" : true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "코멘트 삭제 완료"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
     "/prc/addCmt": {
       "post": {
         "tags": [
@@ -1283,6 +1326,446 @@
                 "resultMsg": {
                   "type": "string",
                   "example": "코멘트 등록 성공"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prc/updtCmt": {
+      "put": {
+        "tags": [
+          "prc"
+        ],
+        "summary": "코멘트 수정",
+        "description": "사용자가 코멘트를 수정한다.",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "comm_id",
+            "in": "formData",
+            "type": "number",
+            "required": true,
+            "example": "1",
+            "description" : "변경대상 코멘트 아이디"
+          },
+          {
+            "name": "comment_description",
+            "in": "formData",
+            "type": "string",
+            "example": "어쩌구저쩌구",
+            "description" : "변경하려는 내용"
+          },
+          {
+            "name": "del_file_id",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 1,
+            "description" : "삭제할 코멘트 파일 번호(다중)"
+          },
+          {
+            "name": "files",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "file"
+            },
+            "description" : "변경할 프로젝트 파일 (다중)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "코멘트 수정 완료"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prc/delCmt": {
+      "delete": {
+        "tags": [
+          "prc"
+        ],
+        "summary": "코멘트 삭제",
+        "description": "사용자가 코멘트를 삭제한다.",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "comm_id",
+            "in": "formData",
+            "type": "number",
+            "required": true,
+            "example": "1",
+            "description" : "변경대상 코멘트 아이디"
+          },
+          {
+            "name": "comment_description",
+            "in": "formData",
+            "type": "string",
+            "example": "어쩌구저쩌구",
+            "description" : "변경하려는 내용"
+          },
+          {
+            "name": "del_file_id",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "number"
+            },
+            "example": 1,
+            "description" : "삭제할 코멘트 파일 번호(다중)"
+          },
+          {
+            "name": "files",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "file"
+            },
+            "description" : "변경할 프로젝트 파일 (다중)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "코멘트 삭제 완료"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prc/lstnRgst": {
+      "post": {
+        "tags": [
+          "prc"
+        ],
+        "summary": "프로세스 최종 정보 등록",
+        "description": "사용자가 프로세스의 최종 정보를 등록한다",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "name": "prj_id",
+            "in": "formData",
+            "type": "number",
+            "required": true,
+            "example": 1,
+            "description" : "등록 대상 프로젝트 아이디"
+          },
+          {
+            "name": "version_number",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "example": "v0.0.1",
+            "description" : "등록 대상 프로젝트 번호"
+          },
+          {
+            "name": "step_number",
+            "in": "formData",
+            "type": "number",
+            "required": true,
+            "example": 1,
+            "description" : "등록 대상 프로젝트 스텝 번호"
+          },
+          {
+            "name": "step_lnk",
+            "in": "formData",
+            "type": "string",
+            "example": "https://naver.com",
+            "description" : "등록하려는 링크"
+          },
+          {
+            "name": "step_description",
+            "in": "formData",
+            "type": "string",
+            "example": "어쩌구저쩌구 왈왈",
+            "description" : "등록하려는 내용"
+          },
+          {
+            "name": "files",
+            "in": "formData",
+            "type": "array",
+            "items" : {
+              "type" : "file"
+            },
+            "description" : "등록하려는 파일 (다중)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "프로젝트 최종 정보 등록 성공"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comm/notiInfo": {
+      "get": {
+        "tags": [
+          "comm"
+        ],
+        "summary": "공지사항 조회",
+        "description": "사용자가 공지사항을 조회한다",
+        "parameters": [
+          {
+            "name": "page_no",
+            "description": "페이지 번호",
+            "in": "query",
+            "type": "number",
+            "example" : 1,
+            "required" : true
+          },
+          {
+            "name": "notice_title",
+            "description": "공지사항 제목",
+            "in": "query",
+            "type": "string",
+            "example" : "공지사항"
+          },
+          {
+            "name": "user_name",
+            "description": "등록자 이름",
+            "in": "query",
+            "type": "string",
+            "example" : "관리자"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "공지사항 조회 성공"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "noti_id" : {
+                        "type" : "number",
+                        "example" : 15
+                      },
+                      "notice_title" : {
+                        "type" : "string",
+                        "example" : "공지사항제목"
+                      },
+                      "rgst_user_id" : {
+                        "type" : "number",
+                        "example" : 6
+                      },
+                      "user_name" : {
+                        "type" : "string",
+                        "example" : "홍길동"
+                      },
+                      "rgst_dtm" : {
+                        "type" : "string",
+                        "example" : "2024-08-29 16:58:09"
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comm/addNoti": {
+      "post": {
+        "tags": [
+          "comm"
+        ],
+        "summary": "공지사항 등록",
+        "description": "사용자가 공지사항을 등록한다",
+        "parameters" : [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "notice_title": { 
+                  "type": "string",
+                  "example" : "공지사항_1", 
+                  "required" : true
+                },
+                "notice_description" : {
+                  "type": "string",
+                  "example" : "공지사항 내용 어쩌구저쩌구", 
+                  "required" : true
+                },
+                "rgst_user_id" : {
+                  "type" : "number",
+                  "example" : 1,
+                  "required" : true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "공지사항 등록 성공"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comm/detail": {
+      "get": {
+        "tags": [
+          "comm"
+        ],
+        "summary": "공지사항 상세 조회",
+        "description": "사용자가 공지사항의 상세화면을 호출한다",
+        "parameters" : [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "notice_title": { 
+                  "type": "string",
+                  "example" : "공지사항_1", 
+                  "required" : true
+                },
+                "notice_description" : {
+                  "type": "string",
+                  "example" : "공지사항 내용 어쩌구저쩌구", 
+                  "required" : true
+                },
+                "rgst_user_id" : {
+                  "type" : "number",
+                  "example" : 1,
+                  "required" : true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "resultCode": {
+                  "type": "number",
+                  "example": 200
+                },
+                "resultMsg": {
+                  "type": "string",
+                  "example": "공지사항 상세 조회 성공"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "userId" : {
+                        "type" : "number",
+                        "example" : 1
+                      },
+                      "loginId" : {
+                        "type" : "string",
+                        "example" : "altm56@gmail.com"
+                      },
+                      "isFirst" : {
+                        "type" : "number",
+                        "example" : 0
+                      },
+                      "userName" : {
+                        "type" : "string",
+                        "example" : "홍길동"
+                      },
+                      "userLevel" : {
+                        "type" : "number",
+                        "example" : 3
+                      },
+                      "userStatus" : {
+                        "type" : "string",
+                        "example" : "W"
+                      }
+                    }
+                  }
                 }
               },
               "xml": {

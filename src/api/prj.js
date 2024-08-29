@@ -177,7 +177,7 @@ router.post('/addPrjVer', upload.array('files'), async(req, res) => {
             const file_id = await mysql.value('prj', 'nextvalId', {id : 'file_id'});
             const prc_file_id = await mysql.value('prj', 'nextvalId', {id : 'prc_file_id'});
             const data = {
-                // prc_file_id : prc_file_id,
+                prc_file_id : prc_file_id,
                 file_id : file_id,
                 prj_id : param.prj_id,
                 step_number : param.step_number,
@@ -637,51 +637,38 @@ router.post('/addLstc', upload.single('file'), async(req, res) => {
    
 
 })
-/* ========== ============= ========== */
-/* ========== 보안 담당자의 프로젝트 승인 PUT ========== */
-/* ========== ============= ========== */
-router.put('/aprPrj',upload.single('file'), async(req, res) => {
 
+router.post('/agrStp', async(req,res) => {
     var param = {
-        prj_id : req.body.prj_id,
-        version_number : req.body.version_number,
-        step_number : req.body.step_number,
-        step_status : req.body.step_status,
-        // step_req_list : typeof req.body.step_req_list == "undefined" ? null : req.body.step_req_list,
-        step_result_comment : typeof req.body.step_result_comment == "undefined" ? null : req.body.step_result_comment,
-        step_result_file : typeof req.file == "undefined" ? null : req.file.path,
-        step_result_url : typeof req.body.step_result_url == "undefined" ? null : req.body.step_result_url
+        step_id : req.body.step_id,
     }
 
-    // 프로젝트 STEP 리스트 출력
-    const prjStepList = await mysql.query('prj', 'selectPrjStep', param);
+    try {
 
-    param.step_id = prjStepList[0].stepId
+        const prjStepList = await mysql.query('prj', 'selectPrjStep', param);
 
-    if(prjStepList.length < 1) {
+        if(prjStepList.length < 1) {
+            return res.json({
+                resultCode : 400,
+                resultMsg : '프로젝트의 스텝아이디가 존재하지 않습니다'
+            })
+        };
+
+        param.prj_id = prjStepList[0].prj_id;
+        param.version_number = prjStepList[0].version_number;
+        param.updt_step_number = prjStepList[0].step_number + 1;
+        param.prc_id = await mysql.value('prj', 'nextvalId', {id : 'prc_id'});
+
+        await mysql.proc('prj', 'updatePrjStep', param);
+        await mysql.proc('prj', 'insertPrcStepInfoDefault', param);
+
+    } catch(error) {
+        console.log(error)
         return res.json({
-            resultCode : 400,
-            resultMsg : "프로젝트 또는 해당 버전이 존재하지 않습니다."
+            resultCode : 500,
+            resultMsg : 'SERVER ERROR'
         })
     }
-
-    await mysql.proc('prj', 'insertPrjStep', param);
-
-    param.history_id = await mysql.value('prj', 'nextvalId', {id : 'history_id'}); 
-    param.step_url = prjStepList[0].stepUrl
-    param.step_file = prjStepList[0].stepFile
-    param.step_comment = prjStepList[0].stepComment
-
-    await mysql.proc('prj', 'insertPrjHistory', param)
-
-    return res.json({
-        resultCode : 200,
-        resultMsg : "프로젝트 상태 변경 완료",
-        // data : prjStepList
-    })
-
-    // history 인서트
-    // step_url, step_file, step_comment 받아와야함 ㅇㅇ
 
 })
 
