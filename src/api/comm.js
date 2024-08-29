@@ -38,26 +38,17 @@ router.post('/addNoti', async (req, res) => {
 router.get('/notiInfo', async(req, res) => {
 
     var param = {
-        page_no : req.query.page_no,
-        notice_title : req.query.notice_title,
-        user_name : req.query.user_name
+        // notice_title : req.query.notice_title,
+        // user_name : req.query.user_name
     }
 
-    const itmesPerPage = 10;
-    const currentPage = (param.page_no - 1) * itmesPerPage;
-
-    param.page_no = currentPage;
-    
     try {
 
         const notiList = await mysql.query('comm', 'selectNoticeListPaging', param);
-        const notiListCt = await mysql.query('comm', 'selectNoticeListCount', param);
-        const totalPage = Math.ceil(notiListCt.length / itmesPerPage);
 
         return res.json({
             resultCode : 200,
             resultMsg : '공지사항 조회 성공',
-            totalPage : totalPage,
             data : notiList
         })
 

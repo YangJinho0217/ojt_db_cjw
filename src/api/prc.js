@@ -12,29 +12,24 @@ router.get('/prcInfo', async(req,res) => {
         step_number : req.query.step_number
     }
 
-    const prcInfoList = await mysql.query('prc' ,'selectPrcStepInfo', param);
+    const prcInfoList = await mysql.select('prc' ,'selectPrcStepInfo', param);
     const prcInfoFileList = await mysql.query('prc', 'selectPrcStepInfoFile', param);
     const prcCommentList = await mysql.query('prc', 'selectPrcComment', param);
 
     const specificString = process.env.SERVER_URL;
     const fileList = [];
     const commentList = [];
+    
 
-    if (prcInfoList.length > 0) {
-        if (prcInfoList[0].lstc_file_path != null) {
-            const modifiedPaths = prcInfoList.map(item => {
-                if(db.host == process.env.DEV_DB_HOST) {
-                    // '/file' 이전의 부분을 제거
-                    const newPath = item.lstc_file_path.split('/develop')[1];
-                    // 특정 문자열과 합치기
-                    const data = specificString + newPath;
-                    return data
-                } else {
-                    return item.lstc_file_path
-                }
-            });
-        
-            prcInfoList[0].lstc_file_path = modifiedPaths
+    if (Object.keys(prcInfoList).length !== 0) {
+        if (prcInfoList.lstc_file_path != null) {
+            if(db.host == process.env.DEV_DB_HOST) {
+                // '/file' 이전의 부분을 제거
+                const newPath = prcInfoList.lstc_file_path.split('/develop')[1];
+                // 특정 문자열과 합치기
+                const data = specificString + newPath;
+                prcInfoList.lstc_file_path = data
+            }
         }
     }
     
@@ -59,7 +54,7 @@ router.get('/prcInfo', async(req,res) => {
                     }
                 }
             });
-            prcInfoList[0].file = modifiedPaths
+            prcInfoList.file = modifiedPaths
         }
 
     }
@@ -106,13 +101,8 @@ router.get('/prcInfo', async(req,res) => {
             };
         });
 
-        if(prcInfoList.length < 1) {
-            prcInfoList.push({
-                commentList : combined
-            })
-        } else {
-            prcInfoList[0].commentList = combined;
-        }
+        prcInfoList.commentList = combined;
+
 
     }
 

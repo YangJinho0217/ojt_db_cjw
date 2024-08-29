@@ -323,25 +323,6 @@
         "description": "가입된 유저 리스트를 출력한다.",
         "parameters": [
           {
-            "name": "page_no",
-            "description": "페이지 번호",
-            "in": "query",
-            "type": "number",
-            "required" : true
-          },
-          {
-            "name": "user_name",
-            "description": "유저 이름",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "login_id",
-            "description": "유저 계정",
-            "in": "query",
-            "type": "string"
-          },
-          {
             "name" : "user_level",
             "description" : "계정 레벨(1: 시스템관리자, 2: 보안담당자, 3: 개발담당자)",
             "in" : "query",
@@ -630,13 +611,6 @@
         "description": "사용자가 프로젝트를 조회한다.",
         "parameters" : [
           {
-            "name" : "page_no",
-            "description" : "페이지 번호",
-            "in" : "query",
-            "type" : "number",
-            "required" : true
-          },
-          {
             "name" : "user_id",
             "description" : "유저 아이디 값",
             "in" : "query",
@@ -857,13 +831,6 @@
         "summary": "특정 프로젝트 히스토리",
         "description": "사용자가 특정 프로젝트 히스토리를 조회한다.",
         "parameters" : [
-          {
-            "name" : "page_no",
-            "description" : "페이지 번호",
-            "in" : "query",
-            "type" : "number",
-            "required" : true
-          },
           {
             "name" : "prj_id",
             "description" : "프로젝트 아이디",
@@ -1410,41 +1377,20 @@
         ],
         "summary": "코멘트 삭제",
         "description": "사용자가 코멘트를 삭제한다.",
-        "consumes": ["multipart/form-data"],
-        "parameters": [
+        "parameters" : [
           {
-            "name": "comm_id",
-            "in": "formData",
-            "type": "number",
-            "required": true,
-            "example": "1",
-            "description" : "변경대상 코멘트 아이디"
-          },
-          {
-            "name": "comment_description",
-            "in": "formData",
-            "type": "string",
-            "example": "어쩌구저쩌구",
-            "description" : "변경하려는 내용"
-          },
-          {
-            "name": "del_file_id",
-            "in": "formData",
-            "type": "array",
-            "items" : {
-              "type" : "number"
-            },
-            "example": 1,
-            "description" : "삭제할 코멘트 파일 번호(다중)"
-          },
-          {
-            "name": "files",
-            "in": "formData",
-            "type": "array",
-            "items" : {
-              "type" : "file"
-            },
-            "description" : "변경할 프로젝트 파일 (다중)"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comm_id": { 
+                  "type": "number",
+                  "example" : 1, 
+                  "required" : true
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -1558,28 +1504,6 @@
         "summary": "공지사항 조회",
         "description": "사용자가 공지사항을 조회한다",
         "parameters": [
-          {
-            "name": "page_no",
-            "description": "페이지 번호",
-            "in": "query",
-            "type": "number",
-            "example" : 1,
-            "required" : true
-          },
-          {
-            "name": "notice_title",
-            "description": "공지사항 제목",
-            "in": "query",
-            "type": "string",
-            "example" : "공지사항"
-          },
-          {
-            "name": "user_name",
-            "description": "등록자 이름",
-            "in": "query",
-            "type": "string",
-            "example" : "관리자"
-          }
         ],
         "responses": {
           "200": {
@@ -1695,30 +1619,14 @@
         ],
         "summary": "공지사항 상세 조회",
         "description": "사용자가 공지사항의 상세화면을 호출한다",
-        "parameters" : [
+        "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "notice_title": { 
-                  "type": "string",
-                  "example" : "공지사항_1", 
-                  "required" : true
-                },
-                "notice_description" : {
-                  "type": "string",
-                  "example" : "공지사항 내용 어쩌구저쩌구", 
-                  "required" : true
-                },
-                "rgst_user_id" : {
-                  "type" : "number",
-                  "example" : 1,
-                  "required" : true
-                }
-              }
-            }
+            "name": "noti_id",
+            "description": "공지사항 아이디",
+            "in": "query",
+            "type": "number",
+            "example" : 1,
+            "required" : true
           }
         ],
         "responses": {
@@ -1736,34 +1644,31 @@
                   "example": "공지사항 상세 조회 성공"
                 },
                 "data": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "userId" : {
-                        "type" : "number",
-                        "example" : 1
-                      },
-                      "loginId" : {
-                        "type" : "string",
-                        "example" : "altm56@gmail.com"
-                      },
-                      "isFirst" : {
-                        "type" : "number",
-                        "example" : 0
-                      },
-                      "userName" : {
-                        "type" : "string",
-                        "example" : "홍길동"
-                      },
-                      "userLevel" : {
-                        "type" : "number",
-                        "example" : 3
-                      },
-                      "userStatus" : {
-                        "type" : "string",
-                        "example" : "W"
-                      }
+                  "type": "object",
+                  "properties": {
+                    "noti_id" : {
+                      "type": "number",
+                      "example" : 1
+                    },
+                    "notice_title": { 
+                      "type": "string",
+                      "example" : "공지사항_1"
+                    },
+                    "notice_description" : {
+                      "type": "string",
+                      "example" : "공지사항 내용 어쩌구저쩌구"
+                    },
+                    "rgst_user_id" : {
+                      "type" : "number",
+                      "example" : 1
+                    },
+                    "user_name" : {
+                      "type" : "string",
+                      "example" : "홍길동"
+                    },
+                    "rgst_dtm" : {
+                      "type" : "string",
+                      "example" : "2024-08-26 16:01:40"
                     }
                   }
                 }

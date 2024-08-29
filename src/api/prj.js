@@ -214,14 +214,9 @@ router.post('/addPrjVer', upload.array('files'), async(req, res) => {
 router.get('/prjList', async(req, res) => {
 
     var param = {
-        page_no : req.query.page_no,
         user_id : req.query.user_id
     };
 
-    const itmesPerPage = 10;
-    const currentPage = (param.page_no - 1) * itmesPerPage;
-
-    param.page_no = currentPage;
 
     const myProjectList = await mysql.query('prj', 'selectPrjAll', param);
     const myProjectListDevUser = await mysql.query('prj', 'selectPrjDevUser', param);
@@ -283,16 +278,16 @@ router.get('/prjList', async(req, res) => {
     
     }).filter(item => item !== null);
 
-    let pageCount;
-    const myProjectListAllCount = await mysql.query('prj', 'selectPrjListCount', param);
-    pageCount = myProjectListAllCount.length;
+    // let pageCount;
+    // const myProjectListAllCount = await mysql.query('prj', 'selectPrjListCount', param);
+    // pageCount = myProjectListAllCount.length;
     
-    const totalPage = Math.ceil(pageCount / itmesPerPage);
+    // const totalPage = Math.ceil(pageCount / itmesPerPage);
 
     return res.json({
         resultCode : 200,
         resultMsg : '프로젝트 조회 완료',
-        totalPage : totalPage,
+        // totalPage : totalPage,
         data : combinedProjectList
     })
 
@@ -308,7 +303,7 @@ router.get('/detail', async(req, res) => {
         version_number : req.query.version_number
     }
 
-    const value = await mysql.query('prj', 'selectPrjVersionDetail', param);
+    const value = await mysql.select('prj', 'selectPrjVersionDetail', param);
     const myProjectListDevUser = await mysql.query('prj', 'selectPrjDevUser', param);
     const myProjectListSecUser = await mysql.query('prj', 'selectPrjSecUser', param);
     const myProjectListFile = await mysql.query('prj', 'selectPrjFile', param);
@@ -331,37 +326,19 @@ router.get('/detail', async(req, res) => {
         
     });
     
-    // 결과를 저장할 배열
-    const combinedProjectList = value.map(prj => {
-        // 개발자 및 보안 사용자 정보를 찾기
-        const devUser = myProjectListDevUser.find(dev => dev.prj_id === prj.prj_id && dev.version_number === prj.version_number);
-        const secUser = myProjectListSecUser.find(sec => sec.prj_id === prj.prj_id && sec.version_number === prj.version_number);
-        
-        // // 결과 객체 생성
-        return {
-            prj_id: prj.prj_id,
-            prj_name: prj.prj_name,
-            prj_description: prj.prj_description,
-            prj_lnk : prj.prj_lnk,
-            version_number: prj.version_number,
-            rgst_user_id : prj.rgst_user_id,
-            rgst_user_name : prj.user_name,
-            step_number: prj.step_number,
-            step_status: prj.step_status,
-            rgst_dtm : prj.rgst_dtm,
-            updt_dtm : prj.updt_dtm,
-            dev_ids: devUser ? devUser.dev_ids : null, // 개발자 ID
-            dev_user_name : devUser ? devUser.user_name : null,
-            sec_ids: secUser ? secUser.sec_ids : null,  // 보안 사용자 ID
-            sec_user_name : secUser ? secUser.user_name : null,
-            files : modifiedPaths
-        };
-    });
+    const devUser = myProjectListDevUser.find(dev => dev.prj_id === value.prj_id && dev.version_number === value.version_number);
+    const secUser = myProjectListSecUser.find(sec => sec.prj_id === value.prj_id && sec.version_number === value.version_number);
+
+    value.sec_user = secUser.sec_ids
+    value.sec_user_name = secUser.user_name
+    value.dev_user_id = devUser.dev_ids
+    value.dev_user_name = devUser.user_name
+    value.file = modifiedPaths
     
     return res.json({
         resultCode : 200,
         resultMsg : '프로젝트 특정 버전 조회 성공',
-        data : combinedProjectList
+        data : value
     })
 })
 
@@ -371,14 +348,8 @@ router.get('/detail', async(req, res) => {
 router.get('/prjHst', async(req,res) => {
     
     var param = {
-        page_no : req.query.page_no,
         prj_id : req.query.prj_id
     };
-
-    const itmesPerPage = 10;
-    const currentPage = (param.page_no - 1) * itmesPerPage;
-
-    param.page_no = currentPage;
 
     const myProjectList = await mysql.query('prj', 'selectPrjHistory', param);
     const myProjectListDevUser = await mysql.query('prj', 'selectPrjDevUser', param);
@@ -409,13 +380,9 @@ router.get('/prjHst', async(req,res) => {
         };
     });
 
-    const myProjectListTotalCount = await mysql.query('prj', 'selectPrjHistoryCount', param);
-    const totalPage = Math.ceil(myProjectListTotalCount.length / itmesPerPage);
-
     return res.json({
         resultCode : 200,
         resultMsg : '특정 프로젝트 히스토리 조회 완료',
-        totalPage : totalPage,
         data : combinedProjectList
     })
 

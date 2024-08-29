@@ -165,7 +165,6 @@
     )
     </if>
     ORDER BY b.rgst_dtm DESC
-    LIMIT ${page_no} , 10;
   </select>
 
   <select id="selectPrjListCount">
@@ -241,16 +240,6 @@
     AND a.prj_id = b.prj_id
     AND a.version_number = b.version_number
     AND a.rgst_user_id = c.user_id
-    ORDER BY b.rgst_dtm DESC
-    LIMIT ${page_no} , 10;
-  </select>
-
-  <select id="selectPrjHistoryCount">
-    SELECT a.prj_id
-    FROM project_version a, project_step b
-    WHERE a.prj_id = #{prj_id}
-    AND a.prj_id = b.prj_id
-    AND a.version_number = b.version_number
     ORDER BY b.rgst_dtm DESC
   </select>
 

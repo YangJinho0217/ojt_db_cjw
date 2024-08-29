@@ -31,14 +31,7 @@
              , a.rgst_dtm
         FROM notice_list a, user_info b
         WHERE a.rgst_user_id = b.user_id
-        <if test="notice_title != undefined">
-        AND a.notice_title LIKE concat('%', #{notice_title}, '%')
-        </if>
-        <if test="user_name != undefined">
-        AND b.user_name LIKE concat('%', #{user_name}, '%')
-        </if>
         ORDER BY a.rgst_dtm DESC
-        LIMIT ${page_no}, 10
     </select>
 
     <select id="selectNoticeListCount">
@@ -64,6 +57,7 @@
              , a.notice_description
              , a.rgst_user_id
              , b.user_name
+             , a.rgst_dtm
         FROM notice_list a, user_info b
         WHERE a.noti_id = #{noti_id}
     </select>
